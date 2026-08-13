@@ -43,6 +43,7 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final endTime = widget.model.endTime;
     return Wrap(
       children: [
         Text(
@@ -53,37 +54,38 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
             color: Colors.grey,
           ),
         ),
-        const Text(
-          ' • ',
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
+        if (endTime != null) ...[
+          const Text(
+            ' • ',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
           ),
-        ),
-        Text(
-          widget.model.endTime!.isBefore(DateTime.now().toUtc())
-              ? pollingEndedTranslation[widget.languageCode]!
-              : '${endsTranslation[widget.languageCode]!}: ${timeago.format(
-                  widget.model.endTime!,
-                  allowFromNow: true,
-                  locale: widget.languageCode,
-                )}',
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
+          Text(
+            endTime.isBefore(DateTime.now().toUtc())
+                ? pollingEndedTranslation[widget.languageCode]!
+                : '${endsTranslation[widget.languageCode]!}: ${timeago.format(
+                    endTime,
+                    allowFromNow: true,
+                    locale: widget.languageCode,
+                  )}',
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
           ),
-        ),
+        ],
 
         /// This checks if post is editable and user has selected an option.
         /// If [model.editablePoll] evaluates to tue and [model.hasVoted] evaluates to true an 'undo' button will show up which on pressed will remove the option selection and lets user select an option again.
         /// If poll time expires undo button will not be visible.
         if ((widget.model.editablePoll == true) &&
             (widget.model.hasVoted == true) &&
-            (widget.model.endTime!
-                .toUtc()
-                .isAfter(DateTime.now().toUtc()))) ...[
+            (endTime == null ||
+                endTime.toUtc().isAfter(DateTime.now().toUtc()))) ...[
           const Text(
             ' • ',
             overflow: TextOverflow.ellipsis,

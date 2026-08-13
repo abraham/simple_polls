@@ -22,10 +22,10 @@ class PollButtonsWidget extends StatelessWidget {
       /// Calls the passed callback to capture response.
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).colorScheme.primary,
         shape: borderShape,
         side: BorderSide(
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           width: 1.5,
         ),
 
@@ -35,7 +35,7 @@ class PollButtonsWidget extends StatelessWidget {
             TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
       ),
       child: Text(

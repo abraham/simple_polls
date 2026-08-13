@@ -20,6 +20,8 @@ class PollResultsWidget extends StatelessWidget {
     return ListTile(
       contentPadding: const EdgeInsets.all(0),
       dense: true,
+      minVerticalPadding: 0,
+      visualDensity: VisualDensity.compact,
       title: Stack(
         alignment: Alignment.centerLeft,
         children: [
@@ -40,7 +42,7 @@ class PollResultsWidget extends StatelessWidget {
                     style: optionsStyle ??
                         TextStyle(
                           fontSize: 13,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,
                         ),
                   ),

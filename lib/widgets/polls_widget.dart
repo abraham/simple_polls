@@ -99,15 +99,16 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
               final endTime = widget.model.endTime;
               final pollExpired = endTime != null &&
                   endTime.toUtc().isBefore(DateTime.now().toUtc());
+              final Widget optionWidget;
               if (widget.model.hasVoted == true || pollExpired) {
-                return PollResultsWidget(
+                optionWidget = PollResultsWidget(
                   percentage: percentage,
                   optionModel: widget.model.options[index],
                   optionsStyle: widget.optionsStyle,
                 );
               } else {
                 /// If check fails the buttons will appear.
-                return PollButtonsWidget(
+                optionWidget = PollButtonsWidget(
                     optionModel: widget.model.options[index],
                     optionsStyle: widget.optionsStyle,
                     borderShape: widget.optionsBorderShape,
@@ -130,12 +131,21 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
                         /// If poll expired show a snackbar and update the widget.
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: const Text('Polling time expired.'),
-                          backgroundColor: Theme.of(context).primaryColor,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                         ));
                         setState(() {});
                       }
                     });
               }
+
+              /// Adds a gap above every option except the first so buttons/results aren't flush against each other.
+              return index == 0
+                  ? optionWidget
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: optionWidget,
+                    );
             },
           ),
           const SizedBox(height: 5),

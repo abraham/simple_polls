@@ -73,8 +73,8 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
       /// If [widget.decoration] is null apply default margin.
       decoration: widget.decoration ??
           BoxDecoration(
-            border: Border.all(color: Colors.grey[200]!),
-            color: Colors.white,
+            border: Border.all(color: Theme.of(context).dividerColor),
+            color: Theme.of(context).colorScheme.surface,
           ),
       child: Column(
         /// CrossAxisAlignment.stretch is used to stretch options buttons to full length.

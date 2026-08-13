@@ -66,9 +66,9 @@ class PollResultsWidget extends StatelessWidget {
       trailing: Text(
         '${(percentage * 100).toStringAsFixed(1)}%',
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
-          color: Colors.grey,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w500,
         ),
       ),

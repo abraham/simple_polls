@@ -24,7 +24,7 @@ class CustomLinearProgressBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(3),
 
               /// If [color] of bar is null default color will be applied.
-              color: color ?? Colors.grey[100],
+              color: color ?? Theme.of(context).colorScheme.primaryContainer,
             ),
             height: height,
 
@@ -35,11 +35,11 @@ class CustomLinearProgressBar extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(3),
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             height: 35,
 
-            /// constraint.maxWidth * (1 - value) will fill the remanining space with white background container.
+            /// constraint.maxWidth * (1 - value) will fill the remanining space with the theme's surface color.
             /// For Example : on a 400px available space and value = 0.25, bar will take 75% of the 400px available.
             width: constraint.maxWidth * (1 - value),
           ),

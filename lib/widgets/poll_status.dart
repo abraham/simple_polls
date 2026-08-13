@@ -49,18 +49,18 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
         Text(
           '${widget.model.totalPolls} ${pollsTranslation[widget.languageCode]!}',
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         if (endTime != null) ...[
-          const Text(
+          Text(
             ' • ',
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           Text(
@@ -72,9 +72,9 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
                     locale: widget.languageCode,
                   )}',
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -86,12 +86,12 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
             (widget.model.hasVoted == true) &&
             (endTime == null ||
                 endTime.toUtc().isAfter(DateTime.now().toUtc()))) ...[
-          const Text(
+          Text(
             ' • ',
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           GestureDetector(
@@ -100,7 +100,7 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
               undoPollTranslation[widget.languageCode]!,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 13,
               ),
             ),

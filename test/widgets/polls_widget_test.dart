@@ -31,4 +31,27 @@ void main() {
     expect(model.hasVoted, isTrue);
     expect(model.totalPolls, 1);
   });
+
+  testWidgets('does not crash and stays votable when endTime is omitted', (
+    tester,
+  ) async {
+    final model = PollFrameModel(
+      totalPolls: 0,
+      options: [PollOptions(label: 'Option A', pollsCount: 0, id: 1)],
+      title: const Text('Question?'),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: SimplePollsWidget(model: model)),
+      ),
+    );
+
+    expect(find.byType(OutlinedButton), findsOneWidget);
+
+    await tester.tap(find.text('Option A'));
+    await tester.pumpAndSettle();
+
+    expect(model.hasVoted, isTrue);
+  });
 }

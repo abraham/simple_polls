@@ -60,14 +60,19 @@ base class SimplePollsBrightnessPreview extends MultiPreview {
   ];
 }
 
-PollFrameModel _buildPollModel({
+PollFrameModel _buildPollModel(
+  BuildContext context, {
   required bool hasVoted,
   bool editablePoll = true,
 }) {
   return PollFrameModel(
-    title: const Text(
+    title: Text(
       'What is your favorite flavor?',
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
     ),
     totalPolls: 100,
     endTime: DateTime.now().toUtc().add(const Duration(days: 10)),
@@ -87,7 +92,7 @@ WidgetBuilder simplePollUnvotedPreview() {
     return SimplePollsWidget(
       languageCode: 'en',
       optionsBorderShape: const StadiumBorder(),
-      model: _buildPollModel(hasVoted: false),
+      model: _buildPollModel(context, hasVoted: false),
       onSelection: (_, _) {},
       onReset: (_) {},
     );
@@ -100,7 +105,7 @@ WidgetBuilder simplePollResultsPreview() {
     return SimplePollsWidget(
       languageCode: 'en',
       optionsBorderShape: const StadiumBorder(),
-      model: _buildPollModel(hasVoted: true),
+      model: _buildPollModel(context, hasVoted: true),
       onSelection: (_, _) {},
       onReset: (_) {},
     );

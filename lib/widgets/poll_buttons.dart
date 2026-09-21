@@ -23,9 +23,12 @@ class PollButtonsWidget extends StatelessWidget {
       /// Calls the passed callback to capture response.
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Theme.of(context).colorScheme.primary,
         shape: borderShape,
-        side: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.5,
+        ),
 
         /// Custom theme will be applied here.
         /// First it checks the passed parameter , if [optionsStyle] is null the default theme will be applied.
@@ -34,7 +37,7 @@ class PollButtonsWidget extends StatelessWidget {
             TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
       ),
       child: Text(optionModel.label, overflow: TextOverflow.ellipsis),

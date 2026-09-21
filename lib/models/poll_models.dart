@@ -18,6 +18,13 @@ class PollFrameModel {
     this.endTime,
     this.editablePoll = false,
   });
+
+  /// True only when [endTime] is set and already in the past. A poll with no [endTime] never ends.
+  bool get hasEnded =>
+      endTime != null && endTime!.toUtc().isBefore(DateTime.now().toUtc());
+
+  /// True when the poll can still accept votes: either it has no [endTime], or [endTime] is still in the future.
+  bool get isActive => !hasEnded;
 }
 
 class PollOptions {

@@ -20,5 +20,26 @@ void main() {
       expect(model.hasVoted, isFalse);
       expect(model.editablePoll, isFalse);
     });
+
+    test('is never ended/always active when endTime is null', () {
+      final model = PollFrameModel(
+        totalPolls: 0,
+        options: const [],
+        title: const Text('Question'),
+      );
+      expect(model.hasEnded, isFalse);
+      expect(model.isActive, isTrue);
+    });
+
+    test('hasEnded/isActive reflect a past endTime', () {
+      final model = PollFrameModel(
+        totalPolls: 0,
+        options: const [],
+        title: const Text('Question'),
+        endTime: DateTime.now().toUtc().subtract(const Duration(days: 1)),
+      );
+      expect(model.hasEnded, isTrue);
+      expect(model.isActive, isFalse);
+    });
   });
 }

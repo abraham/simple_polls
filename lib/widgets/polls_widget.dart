@@ -44,15 +44,13 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.model.endTime!.toUtc().isAfter(DateTime.now().toUtc())) {
+    final endTime = widget.model.endTime;
+    if (endTime != null && widget.model.isActive) {
       /// This will refresh the widget when the poll time expires, this timer will get cancel on dispose.
-      refreshTimer = Timer(
-        widget.model.endTime!.difference(DateTime.now().toUtc()),
-        () {
-          /// Reloads the widget when poll end time reaches so that results screen will be visible by default, even if user has not voted.
-          setState(() {});
-        },
-      );
+      refreshTimer = Timer(endTime.difference(DateTime.now().toUtc()), () {
+        /// Reloads the widget when poll end time reaches so that results screen will be visible by default, even if user has not voted.
+        setState(() {});
+      });
     }
   }
 
@@ -99,10 +97,7 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
                       widget.model.totalPolls;
 
             /// Check if the person has voted or poll has expired, if conditions are met the results screen will show up.
-            if ((widget.model.hasVoted == true) ||
-                widget.model.endTime!.toUtc().isBefore(
-                  DateTime.now().toUtc(),
-                )) {
+            if ((widget.model.hasVoted == true) || widget.model.hasEnded) {
               return PollResultsWidget(
                 percentage: percentage,
                 optionModel: widget.model.options[index],
@@ -116,9 +111,7 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
                 borderShape: widget.optionsBorderShape,
                 onPressed: () {
                   /// Check if poll is still active, if active update the widget with user's response.
-                  if (widget.model.endTime!.toUtc().isAfter(
-                    DateTime.now().toUtc(),
-                  )) {
+                  if (widget.model.isActive) {
                     setState(() {
                       widget.model.hasVoted = true;
                       widget.model.options[index].isSelected = true;

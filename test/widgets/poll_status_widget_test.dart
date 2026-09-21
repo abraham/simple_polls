@@ -58,4 +58,30 @@ void main() {
     await tester.tap(find.text('undo'));
     expect(undone, isTrue);
   });
+
+  testWidgets('hides the ends/ended text when endTime is omitted', (
+    tester,
+  ) async {
+    final model = PollFrameModel(
+      totalPolls: 2,
+      options: [PollOptions(label: 'A', pollsCount: 2, id: 1)],
+      title: const Text('Q'),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PollStatusWidget(
+            model: model,
+            languageCode: 'en',
+            onUndo: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('2 polls'), findsOneWidget);
+    expect(find.textContaining('Ends'), findsNothing);
+    expect(find.text('Polling Ended'), findsNothing);
+  });
 }

@@ -10,6 +10,9 @@ class PollFrameModel {
   bool hasVoted;
   final bool editablePoll;
 
+  /// If true, users can select more than one option before submitting their vote.
+  final bool allowMultipleSelection;
+
   PollFrameModel({
     required this.totalPolls,
     required this.options,
@@ -17,6 +20,7 @@ class PollFrameModel {
     required this.title,
     this.endTime,
     this.editablePoll = false,
+    this.allowMultipleSelection = false,
   });
 
   /// True only when [endTime] is set and already in the past. A poll with no [endTime] never ends.

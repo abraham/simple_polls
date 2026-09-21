@@ -34,3 +34,12 @@ Map<String, String> undoPollTranslation = {
   'fr': 'annuler',
   'es': 'deshacer',
 };
+
+/// The [voteButtonTranslation] variable is used for translation for the multi-select 'Vote' submit button.
+Map<String, String> voteButtonTranslation = {
+  'en': 'Vote',
+  'it': 'Vota',
+  'de': 'Abstimmen',
+  'fr': 'Voter',
+  'es': 'Votar',
+};

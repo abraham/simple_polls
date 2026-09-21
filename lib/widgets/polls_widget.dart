@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'poll_buttons.dart';
 import '../models/poll_models.dart';
+import '../translations/translations.dart';
 import 'poll_results.dart';
 import 'poll_status.dart';
 
@@ -15,6 +16,10 @@ class SimplePollsWidget extends StatefulWidget {
   final EdgeInsets? padding;
   final Decoration? decoration;
   final Function(PollFrameModel frameModel, PollOptions option)? onSelection;
+
+  /// Called when a multi-selection poll (see [PollFrameModel.allowMultipleSelection]) is submitted.
+  final Function(PollFrameModel frameModel, List<PollOptions> selectedOptions)?
+  onMultiSelection;
   final Function(PollFrameModel frameModel)? onReset;
   final String languageCode;
   final TextStyle? optionsStyle;
@@ -26,6 +31,7 @@ class SimplePollsWidget extends StatefulWidget {
     this.padding,
     this.decoration,
     this.onSelection,
+    this.onMultiSelection,
     this.languageCode = 'en',
     this.optionsStyle,
     this.optionsBorderShape = const StadiumBorder(),
@@ -104,6 +110,30 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
                 optionModel: widget.model.options[index],
                 optionsStyle: widget.optionsStyle,
               );
+            } else if (widget.model.allowMultipleSelection) {
+              /// In multi-select mode, tapping only toggles the option; the vote is submitted separately.
+              optionWidget = PollButtonsWidget(
+                optionModel: widget.model.options[index],
+                optionsStyle: widget.optionsStyle,
+                borderShape: widget.optionsBorderShape,
+                showSelectionIndicator: true,
+                onPressed: () {
+                  if (widget.model.isActive) {
+                    setState(() {
+                      widget.model.options[index].isSelected =
+                          !widget.model.options[index].isSelected;
+                    });
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Polling time expired.'),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                    setState(() {});
+                  }
+                },
+              );
             } else {
               /// If check fails the buttons will appear.
               optionWidget = PollButtonsWidget(
@@ -148,6 +178,40 @@ class _SimplePollsWidgetState extends State<SimplePollsWidget> {
                   );
           }),
           const SizedBox(height: 5),
+
+          /// For multi-select polls, show a submit button to cast the vote for all toggled options.
+          if (widget.model.allowMultipleSelection &&
+              widget.model.hasVoted != true &&
+              widget.model.isActive)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: ElevatedButton(
+                onPressed:
+                    widget.model.options.any((option) => option.isSelected)
+                    ? () {
+                        setState(() {
+                          final selectedOptions = widget.model.options
+                              .where((option) => option.isSelected)
+                              .toList();
+                          widget.model.hasVoted = true;
+                          widget.model.totalPolls += 1;
+                          for (final option in selectedOptions) {
+                            option.pollsCount += 1;
+                          }
+                          if (widget.onMultiSelection != null) {
+                            widget.onMultiSelection!.call(
+                              widget.model,
+                              selectedOptions,
+                            );
+                          }
+                        });
+                      }
+                    : null,
+                child: Text(
+                  voteButtonTranslation[widget.languageCode] ?? 'Vote',
+                ),
+              ),
+            ),
 
           /// Following widget will show the status of total polls and poll timer, it has a undo button which will show up if poll is editable.
           PollStatusWidget(

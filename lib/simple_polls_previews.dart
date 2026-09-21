@@ -64,6 +64,7 @@ PollFrameModel _buildPollModel(
   BuildContext context, {
   required bool hasVoted,
   bool editablePoll = true,
+  bool allowMultipleSelection = false,
 }) {
   return PollFrameModel(
     title: Text(
@@ -78,8 +79,14 @@ PollFrameModel _buildPollModel(
     endTime: DateTime.now().toUtc().add(const Duration(days: 10)),
     hasVoted: hasVoted,
     editablePoll: editablePoll,
+    allowMultipleSelection: allowMultipleSelection,
     options: <PollOptions>[
-      PollOptions(label: 'Vanilla', pollsCount: 40, isSelected: false, id: 1),
+      PollOptions(
+        label: 'Vanilla',
+        pollsCount: 40,
+        isSelected: allowMultipleSelection,
+        id: 1,
+      ),
       PollOptions(label: 'Chocolate', pollsCount: 25, isSelected: false, id: 2),
       PollOptions(label: 'Strawberry', pollsCount: 35, isSelected: true, id: 3),
     ],
@@ -107,6 +114,23 @@ WidgetBuilder simplePollResultsPreview() {
       optionsBorderShape: const StadiumBorder(),
       model: _buildPollModel(context, hasVoted: true),
       onSelection: (_, _) {},
+      onReset: (_) {},
+    );
+  };
+}
+
+@SimplePollsBrightnessPreview('Multi-select poll')
+WidgetBuilder simplePollMultiSelectPreview() {
+  return (context) {
+    return SimplePollsWidget(
+      languageCode: 'en',
+      optionsBorderShape: const StadiumBorder(),
+      model: _buildPollModel(
+        context,
+        hasVoted: false,
+        allowMultipleSelection: true,
+      ),
+      onMultiSelection: (_, _) {},
       onReset: (_) {},
     );
   };

@@ -1,48 +1,48 @@
-// This file contains the actual option widget used.
+// This file contains the button used to render a single, votable poll option.
 import 'package:flutter/material.dart';
 
-import '../models/poll_models.dart';
-
-class PollButtonsWidget extends StatelessWidget {
+class PollOptionButton extends StatelessWidget {
   /// This class does not have state that's why created as stateless.
-  final PollOptions optionModel;
-  final TextStyle? optionsStyle;
-  final Function() onPressed;
-  final OutlinedBorder borderShape;
+  final String label;
+  final TextStyle? textStyle;
+  final VoidCallback onPressed;
+  final OutlinedBorder shape;
 
-  /// When true, the button shows a checkmark and a filled background if [optionModel.isSelected] is true.
+  /// When true, the button shows a checkmark and a filled background if [isSelected] is true.
   /// Used for multi-select polls where an option can be toggled before submitting.
   final bool showSelectionIndicator;
-  const PollButtonsWidget({
+  final bool isSelected;
+  const PollOptionButton({
     super.key,
-    required this.optionModel,
+    required this.label,
     required this.onPressed,
-    this.optionsStyle,
-    this.borderShape = const StadiumBorder(),
+    this.textStyle,
+    this.shape = const StadiumBorder(),
     this.showSelectionIndicator = false,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = showSelectionIndicator && optionModel.isSelected;
+    final showIndicator = showSelectionIndicator && isSelected;
     return OutlinedButton(
       /// Calls the passed callback to capture response.
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         foregroundColor: Theme.of(context).colorScheme.primary,
-        backgroundColor: isSelected
+        backgroundColor: showIndicator
             ? Theme.of(context).colorScheme.primaryContainer
             : null,
-        shape: borderShape,
+        shape: shape,
         side: BorderSide(
           color: Theme.of(context).colorScheme.primary,
           width: 1.5,
         ),
 
         /// Custom theme will be applied here.
-        /// First it checks the passed parameter , if [optionsStyle] is null the default theme will be applied.
+        /// First it checks the passed parameter , if [textStyle] is null the default theme will be applied.
         textStyle:
-            optionsStyle ??
+            textStyle ??
             TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -52,7 +52,7 @@ class PollButtonsWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (isSelected) ...[
+          if (showIndicator) ...[
             Icon(
               Icons.check_circle,
               size: 16,
@@ -60,9 +60,7 @@ class PollButtonsWidget extends StatelessWidget {
             ),
             const SizedBox(width: 6),
           ],
-          Flexible(
-            child: Text(optionModel.label, overflow: TextOverflow.ellipsis),
-          ),
+          Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
         ],
       ),
     );

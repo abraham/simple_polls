@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:simple_polls/models/poll_models.dart';
-import 'package:simple_polls/widgets/poll_results.dart';
+import 'package:simple_polls/widgets/poll_option_result.dart';
 
 void main() {
   testWidgets('renders label and computed percentage', (tester) async {
-    final option = PollOptions(
-      label: 'Option A',
-      pollsCount: 5,
-      id: 1,
-      isSelected: true,
-    );
-
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Scaffold(
-          body: PollResultsWidget(percentage: 0.5, optionModel: option),
+          body: PollOptionResult(
+            label: 'Option A',
+            percentage: 0.5,
+            isSelected: true,
+          ),
         ),
       ),
     );
@@ -26,12 +22,10 @@ void main() {
   });
 
   testWidgets('hides check icon when option is not selected', (tester) async {
-    final option = PollOptions(label: 'Option A', pollsCount: 0, id: 1);
-
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Scaffold(
-          body: PollResultsWidget(percentage: 0, optionModel: option),
+          body: PollOptionResult(label: 'Option A', percentage: 0),
         ),
       ),
     );

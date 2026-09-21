@@ -60,78 +60,68 @@ base class SimplePollsBrightnessPreview extends MultiPreview {
   ];
 }
 
-PollFrameModel _buildPollModel(
-  BuildContext context, {
-  required bool hasVoted,
-  bool editablePoll = true,
-  bool allowMultipleSelection = false,
-}) {
-  return PollFrameModel(
-    title: Text(
-      'What is your favorite flavor?',
-      style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
-    ),
-    totalPolls: 100,
-    endTime: DateTime.now().toUtc().add(const Duration(days: 10)),
-    hasVoted: hasVoted,
-    editablePoll: editablePoll,
-    allowMultipleSelection: allowMultipleSelection,
-    options: <PollOptions>[
-      PollOptions(
-        label: 'Vanilla',
-        pollsCount: 40,
-        isSelected: allowMultipleSelection,
-        id: 1,
-      ),
-      PollOptions(label: 'Chocolate', pollsCount: 25, isSelected: false, id: 2),
-      PollOptions(label: 'Strawberry', pollsCount: 35, isSelected: true, id: 3),
+Poll<int> _buildPoll({bool allowsMultipleAnswers = false}) {
+  return Poll<int>(
+    title: 'What is your favorite flavor?',
+    endsAt: DateTime.now().toUtc().add(const Duration(days: 10)),
+    isEditable: true,
+    allowsMultipleAnswers: allowsMultipleAnswers,
+    options: const <PollOption<int>>[
+      PollOption(id: 1, label: 'Vanilla', voteCount: 40),
+      PollOption(id: 2, label: 'Chocolate', voteCount: 25),
+      PollOption(id: 3, label: 'Strawberry', voteCount: 35),
     ],
   );
 }
 
+/// Since [SimplePoll] is a controlled widget, the preview needs its own
+/// state holder to actually reflect a tapped option as a cast vote.
+class _InteractivePollPreview extends StatefulWidget {
+  const _InteractivePollPreview({required this.initialPoll, this.initialVote});
+
+  final Poll<int> initialPoll;
+  final PollVote<int>? initialVote;
+
+  @override
+  State<_InteractivePollPreview> createState() =>
+      _InteractivePollPreviewState();
+}
+
+class _InteractivePollPreviewState extends State<_InteractivePollPreview> {
+  late Poll<int> _poll = widget.initialPoll;
+  late PollVote<int>? _vote = widget.initialVote;
+
+  @override
+  Widget build(BuildContext context) {
+    return SimplePoll<int>(
+      poll: _poll,
+      vote: _vote,
+      onVoteChanged: (newVote) {
+        setState(() {
+          _poll = _poll.withVoteApplied(previousVote: _vote, newVote: newVote);
+          _vote = newVote;
+        });
+      },
+    );
+  }
+}
+
 @SimplePollsBrightnessPreview('Unvoted poll')
 WidgetBuilder simplePollUnvotedPreview() {
-  return (context) {
-    return SimplePollsWidget(
-      languageCode: 'en',
-      optionsBorderShape: const StadiumBorder(),
-      model: _buildPollModel(context, hasVoted: false),
-      onSelection: (_, _) {},
-      onReset: (_) {},
-    );
-  };
+  return (context) => _InteractivePollPreview(initialPoll: _buildPoll());
 }
 
 @SimplePollsBrightnessPreview('Results poll')
 WidgetBuilder simplePollResultsPreview() {
-  return (context) {
-    return SimplePollsWidget(
-      languageCode: 'en',
-      optionsBorderShape: const StadiumBorder(),
-      model: _buildPollModel(context, hasVoted: true),
-      onSelection: (_, _) {},
-      onReset: (_) {},
-    );
-  };
+  return (context) => _InteractivePollPreview(
+    initialPoll: _buildPoll(),
+    initialVote: const PollVote<int>({3}),
+  );
 }
 
 @SimplePollsBrightnessPreview('Multi-select poll')
 WidgetBuilder simplePollMultiSelectPreview() {
-  return (context) {
-    return SimplePollsWidget(
-      languageCode: 'en',
-      optionsBorderShape: const StadiumBorder(),
-      model: _buildPollModel(
-        context,
-        hasVoted: false,
-        allowMultipleSelection: true,
-      ),
-      onMultiSelection: (_, _) {},
-      onReset: (_) {},
-    );
-  };
+  return (context) => _InteractivePollPreview(
+    initialPoll: _buildPoll(allowsMultipleAnswers: true),
+  );
 }

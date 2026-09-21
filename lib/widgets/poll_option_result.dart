@@ -1,19 +1,22 @@
-// This file contains the results widget.
+// This file contains the results widget for a single poll option.
 import 'package:flutter/material.dart';
 
-import '../models/poll_models.dart';
-import 'progress_widget.dart';
+import 'poll_progress_bar.dart';
 
-class PollResultsWidget extends StatelessWidget {
-  /// This widget will show the results of poll.
+class PollOptionResult extends StatelessWidget {
+  /// This widget will show the results of a single poll option.
+  final String label;
   final double percentage;
-  final PollOptions optionModel;
-  final TextStyle? optionsStyle;
-  const PollResultsWidget({
+  final bool isSelected;
+  final TextStyle? textStyle;
+  final Color? progressBarColor;
+  const PollOptionResult({
     super.key,
+    required this.label,
     required this.percentage,
-    required this.optionModel,
-    this.optionsStyle,
+    this.isSelected = false,
+    this.textStyle,
+    this.progressBarColor,
   });
 
   @override
@@ -26,8 +29,8 @@ class PollResultsWidget extends StatelessWidget {
       title: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          /// CustomLinearProgressBar is a widget that works like a progress bar but will be static.
-          CustomLinearProgressBar(value: percentage),
+          /// PollProgressBar is a widget that works like a progress bar but will be static.
+          PollProgressBar(value: percentage, color: progressBarColor),
 
           /// This will create the label of the option in results screen.
           Row(
@@ -36,10 +39,10 @@ class PollResultsWidget extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
-                    optionModel.label,
+                    label,
                     overflow: TextOverflow.ellipsis,
                     style:
-                        optionsStyle ??
+                        textStyle ??
                         TextStyle(
                           fontSize: 13,
                           color: Theme.of(context).colorScheme.primary,
@@ -49,8 +52,8 @@ class PollResultsWidget extends StatelessWidget {
                 ),
               ),
 
-              /// If [optionModel.isSelected] is true a circle with tick will appear after that label,which indicates the selected of that particular option.
-              if (optionModel.isSelected == true)
+              /// If [isSelected] is true a circle with tick will appear after that label, which indicates the selection of that particular option.
+              if (isSelected)
                 Container(
                   padding: const EdgeInsets.only(left: 10),
                   child: const Icon(
@@ -64,7 +67,7 @@ class PollResultsWidget extends StatelessWidget {
         ],
       ),
 
-      /// Trailing portion will show the percentage of polls for each option.
+      /// Trailing portion will show the percentage of votes for each option.
       trailing: Text(
         '${(percentage * 100).toStringAsFixed(1)}%',
         overflow: TextOverflow.ellipsis,

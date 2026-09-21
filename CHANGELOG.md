@@ -1,3 +1,26 @@
+## 2.0.0
+
+* BREAKING: API redesign
+* `SimplePollsWidget` -> `SimplePoll<T>`, `PollFrameModel` -> `Poll<T>`,
+`PollOptions` -> `PollOption<T>` (`id` is now generic instead of `dynamic`).
+* The widget no longer mutates its model. It is a fully controlled widget:
+it takes an immutable `Poll<T>` plus a `PollVote<T>?`, and reports intended
+changes through a single `onVoteChanged` callback instead of the old
+`onSelection`/`onMultiSelection`/`onReset` trio. `onVoteChanged` returns
+`FutureOr<void>` so a network call can be awaited before the vote is
+reflected, and a new `onVoteError` callback reports failures.
+* Added `Poll.withVoteApplied(...)` to compute updated vote counts after a
+vote changes.
+* `margin`/`padding`/`decoration`/`optionsStyle`/`optionsBorderShape`
+constructor parameters replaced by a single `style: PollStyle(...)`.
+* `languageCode` string + hardcoded translation maps replaced by a
+pluggable `locale: PollLocale` (built-in `PollLocale.en/.it/.fr/.es/.de`).
+* `PollFrameModel.title` is now a `String` instead of a `Widget` (use the
+new `titleBuilder` for custom rendering).
+* Renamed internal widgets: `PollButtonsWidget` -> `PollOptionButton`,
+`PollResultsWidget` -> `PollOptionResult`, `PollStatusWidget` ->
+`PollStatusBar`, `CustomLinearProgressBar` -> `PollProgressBar`.
+
 ## 1.0.0
 
 * Initial release.

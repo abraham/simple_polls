@@ -1,4 +1,4 @@
-// This file contains the example showing how to use poll widget in your application.
+// This file contains the example showing how to use the poll widget in your application.
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -25,8 +25,33 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ExampleApp extends StatelessWidget {
+class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
+
+  @override
+  State<ExampleApp> createState() => _ExampleAppState();
+}
+
+class _ExampleAppState extends State<ExampleApp> {
+  /// The poll's server-truth data. In a real app this would come from a backend.
+  var _poll = Poll<int>(
+    title: 'Questo è il titolo del sondaggio. Questo è il titolo del sondaggio. Questo è il titolo del sondaggio.',
+
+    /// Poll end time.
+    endsAt: DateTime.now().toUtc().add(const Duration(days: 10)),
+
+    /// If poll is editable then an undo button will appear once voted.
+    isEditable: true,
+    options: const <PollOption<int>>[
+      /// Configure options here. [PollOption.id] can be any type, not just int.
+      PollOption(id: 1, label: 'opzione 1', voteCount: 40),
+      PollOption(id: 2, label: 'opzione 2', voteCount: 25),
+      PollOption(id: 3, label: 'opzione 3', voteCount: 35),
+    ],
+  );
+
+  /// The vote cast for [_poll], or null if the user hasn't voted yet.
+  PollVote<int>? _vote;
 
   @override
   Widget build(BuildContext context) {
@@ -40,88 +65,40 @@ class ExampleApp extends StatelessWidget {
         centerTitle: true,
         toolbarHeight: 40,
       ),
-      body: SimplePollsWidget(
-        /// onSelection will be triggered when users presses a option or presses undo button(only available on editable polls).
-        /// This function will be called after all the calculation like reducing total polls and marking previous option not selected.
-        /// It returns the PollFrameModel .Use this function to do some extra operations like storing this poll into other variable.
-        onSelection: (PollFrameModel model, PollOptions? selectedOptionModel) {
-          log('Now total polls are : ${model.totalPolls}');
-          log('Selected option has label : ${selectedOptionModel!.label}');
+      body: SimplePoll<int>(
+        poll: _poll,
+        vote: _vote,
+
+        /// Called whenever the user casts, changes, or clears (undo) their vote.
+        /// It returns `FutureOr<void>` so a network call can be awaited here
+        /// before the widget reflects the new vote.
+        onVoteChanged: (newVote) {
+          log('Selected option ids: ${newVote?.selectedOptionIds}');
+          setState(() {
+            _poll = _poll.withVoteApplied(
+              previousVote: _vote,
+              newVote: newVote,
+            );
+            _vote = newVote;
+          });
         },
-        onReset: (PollFrameModel model) {
-          log(
-            'Poll has been reset, this happens only in case of editable polls',
-          );
-        },
-        optionsBorderShape: const StadiumBorder(), // Default is stadium border
-        /// optionsStyle will have style used in options.
-        optionsStyle: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).primaryColor,
-        ),
+        onVoteError: (error, stackTrace) => log('Vote failed: $error'),
 
-        /// languageCode will be used to translate some text used in status like total polls, Poll end time, Undo button.
-        /// Allowed values are it,fr,es,gr,en where en is default.
-        /// For more language support add translations for that language code in translations/translations.dart and widgets/poll_status.dart.
-        /// Add timeago.setLocaleMessages('it', timeago.ItMessages()); to register locales for timeago/remaining in widgets/poll_status.dart.
-        /// Add 'es': 'deshacer' to maps present in translations/translations.dart for other translations.
-        languageCode: 'it',
-
-        /// Content Padding inside polls widget.
-        padding: const EdgeInsets.all(15),
-
-        /// Margin for polls widget.
-        margin: const EdgeInsets.all(15),
-
-        /// Data to be passed to polls widget.
-        model: PollFrameModel(
-          /// Title of the widget.
-          title: Container(
-            alignment: Alignment.centerLeft,
-            child: const Text(
-              'Questo è il titolo del sondaggio. Questo è il titolo del sondaggio. Questo è il titolo del sondaggio.',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
+        /// A single object controls margin/padding/decoration/text style/shape.
+        style: PollStyle(
+          margin: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
+          optionTextStyle: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).primaryColor,
           ),
-          totalPolls: 100,
-
-          /// Poll end time
-          endTime: DateTime.now().toUtc().add(const Duration(days: 10)),
-
-          /// If user hasVoted then results screen will show up.
-          hasVoted: false,
-
-          /// If poll is editable then undo button will appear in results screen to participate in poll again.
-          editablePoll: true,
-          options: <PollOptions>[
-            /// Configure options here
-            PollOptions(
-              label: "opzione 1",
-              pollsCount: 40,
-
-              /// Polls received by that option.
-              isSelected: false,
-
-              /// If poll selected.
-              id: 1,
-
-              /// Option id.
-            ),
-            PollOptions(
-              label: "opzione 2",
-              pollsCount: 25,
-              isSelected: false,
-              id: 2,
-            ),
-            PollOptions(
-              label: "opzione 3",
-              pollsCount: 35,
-              isSelected: false,
-              id: 3,
-            ),
-          ],
         ),
+
+        /// Built-in locales: [PollLocale.en] (default), [PollLocale.it],
+        /// [PollLocale.fr], [PollLocale.es], [PollLocale.de]. Construct a
+        /// custom [PollLocale] to add another language or override any label.
+        locale: PollLocale.it,
       ),
     );
   }

@@ -1,0 +1,27 @@
+name: Main
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          version: 3.47.5
+          cache: true
+          cache-sdk: true
+          cache-key: ${{ hashFiles('pubspec.lock') }}
+      - run: flutter pub get
+      - name: format
+        run: dart format . --set-exit-if-changed
+      - name: analyze
+        run: flutter analyze
+      - name: test
+        run: flutter test
+      - name: publish dry-run
+        run: flutter pub publish --dry-run

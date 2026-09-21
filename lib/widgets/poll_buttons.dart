@@ -1,4 +1,4 @@
-/// This file contains the actual option widget used.
+// This file contains the actual option widget used.
 import 'package:flutter/material.dart';
 
 import '../models/poll_models.dart';
@@ -10,12 +10,12 @@ class PollButtonsWidget extends StatelessWidget {
   final Function() onPressed;
   final OutlinedBorder borderShape;
   const PollButtonsWidget({
-    Key? key,
+    super.key,
     required this.optionModel,
     required this.onPressed,
     this.optionsStyle,
     this.borderShape = const StadiumBorder(),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

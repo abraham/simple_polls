@@ -1,4 +1,4 @@
-/// This file contains 2 models which will be used to create polls widget.
+// This file contains 2 models which will be used to create polls widget.
 import 'package:flutter/material.dart';
 
 class PollFrameModel {

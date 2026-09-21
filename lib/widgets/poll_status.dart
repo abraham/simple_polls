@@ -1,4 +1,4 @@
-/// This file contains the widget which will appear the below the options widget.
+// This file contains the widget which will appear the below the options widget.
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -12,11 +12,11 @@ class PollStatusWidget extends StatefulWidget {
   final String languageCode;
   final Function() onUndo;
   const PollStatusWidget({
-    Key? key,
+    super.key,
     required this.model,
     required this.languageCode,
     required this.onUndo,
-  }) : super(key: key);
+  });
 
   @override
   State<PollStatusWidget> createState() => _PollStatusWidgetState();

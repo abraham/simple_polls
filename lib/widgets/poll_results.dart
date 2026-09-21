@@ -1,5 +1,6 @@
 /// This file contains the results widget.
 import 'package:flutter/material.dart';
+
 import '../models/poll_models.dart';
 import 'progress_widget.dart';
 
@@ -24,9 +25,7 @@ class PollResultsWidget extends StatelessWidget {
         alignment: Alignment.centerLeft,
         children: [
           /// CustomLinearProgressBar is a widget that works like a progress bar but will be static.
-          CustomLinearProgressBar(
-            value: percentage,
-          ),
+          CustomLinearProgressBar(value: percentage),
 
           /// This will create the label of the option in results screen.
           Row(
@@ -37,7 +36,8 @@ class PollResultsWidget extends StatelessWidget {
                   child: Text(
                     optionModel.label,
                     overflow: TextOverflow.ellipsis,
-                    style: optionsStyle ??
+                    style:
+                        optionsStyle ??
                         TextStyle(
                           fontSize: 13,
                           color: Theme.of(context).primaryColor,

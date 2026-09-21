@@ -1,6 +1,7 @@
 /// This file contains the widget which will appear the below the options widget.
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
 import '../models/poll_models.dart';
 import '../translations/translations.dart';
 
@@ -48,32 +49,19 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
         Text(
           '${widget.model.totalPolls} ${pollsTranslation[widget.languageCode]!}',
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const Text(
           ' • ',
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey),
         ),
         Text(
           widget.model.endTime!.isBefore(DateTime.now().toUtc())
               ? pollingEndedTranslation[widget.languageCode]!
-              : '${endsTranslation[widget.languageCode]!}: ${timeago.format(
-                  widget.model.endTime!,
-                  allowFromNow: true,
-                  locale: widget.languageCode,
-                )}',
+              : '${endsTranslation[widget.languageCode]!}: ${timeago.format(widget.model.endTime!, allowFromNow: true, locale: widget.languageCode)}',
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
 
         /// This checks if post is editable and user has selected an option.
@@ -81,16 +69,13 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
         /// If poll time expires undo button will not be visible.
         if ((widget.model.editablePoll == true) &&
             (widget.model.hasVoted == true) &&
-            (widget.model.endTime!
-                .toUtc()
-                .isAfter(DateTime.now().toUtc()))) ...[
+            (widget.model.endTime!.toUtc().isAfter(
+              DateTime.now().toUtc(),
+            ))) ...[
           const Text(
             ' • ',
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           GestureDetector(
             onTap: widget.onUndo,
@@ -103,7 +88,7 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
               ),
             ),
           ),
-        ]
+        ],
       ],
     );
   }

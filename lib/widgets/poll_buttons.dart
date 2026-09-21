@@ -1,5 +1,6 @@
 /// This file contains the actual option widget used.
 import 'package:flutter/material.dart';
+
 import '../models/poll_models.dart';
 
 class PollButtonsWidget extends StatelessWidget {
@@ -24,24 +25,19 @@ class PollButtonsWidget extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         primary: Theme.of(context).primaryColor,
         shape: borderShape,
-        side: BorderSide(
-          color: Theme.of(context).primaryColor,
-          width: 1.5,
-        ),
+        side: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
 
         /// Custom theme will be applied here.
         /// First it checks the passed parameter , if [optionsStyle] is null the default theme will be applied.
-        textStyle: optionsStyle ??
+        textStyle:
+            optionsStyle ??
             TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Theme.of(context).primaryColor,
             ),
       ),
-      child: Text(
-        optionModel.label,
-        overflow: TextOverflow.ellipsis,
-      ),
+      child: Text(optionModel.label, overflow: TextOverflow.ellipsis),
     );
   }
 }

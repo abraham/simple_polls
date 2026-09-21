@@ -1,4 +1,4 @@
-/// This file contains the main widget that will be used to build poll widget.
+// This file contains the main widget that will be used to build poll widget.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class SimplePollsWidget extends StatefulWidget {
   final TextStyle? optionsStyle;
   final OutlinedBorder optionsBorderShape;
   const SimplePollsWidget({
-    Key? key,
+    super.key,
     required this.model,
     this.margin,
     this.padding,
@@ -30,7 +30,7 @@ class SimplePollsWidget extends StatefulWidget {
     this.optionsStyle,
     this.optionsBorderShape = const StadiumBorder(),
     this.onReset,
-  }) : super(key: key);
+  });
 
   @override
   State<SimplePollsWidget> createState() => _SimplePollsWidgetState();

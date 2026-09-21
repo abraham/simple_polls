@@ -1,4 +1,4 @@
-/// This file contains the results widget.
+// This file contains the results widget.
 import 'package:flutter/material.dart';
 
 import '../models/poll_models.dart';
@@ -10,11 +10,11 @@ class PollResultsWidget extends StatelessWidget {
   final PollOptions optionModel;
   final TextStyle? optionsStyle;
   const PollResultsWidget({
-    Key? key,
+    super.key,
     required this.percentage,
     required this.optionModel,
     this.optionsStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

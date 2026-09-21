@@ -1,4 +1,4 @@
-/// This file contains the example showing how to use poll widget in your application.
+// This file contains the example showing how to use poll widget in your application.
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 }
 
 class ExampleApp extends StatelessWidget {
-  const ExampleApp({Key? key}) : super(key: key);
+  const ExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +49,11 @@ class ExampleApp extends StatelessWidget {
           log('Selected option has label : ${selectedOptionModel!.label}');
         },
         onReset: (PollFrameModel model) {
-          log('Poll has been reset, this happens only in case of editable polls');
+          log(
+            'Poll has been reset, this happens only in case of editable polls',
+          );
         },
         optionsBorderShape: const StadiumBorder(), // Default is stadium border
-
         /// optionsStyle will have style used in options.
         optionsStyle: TextStyle(
           fontSize: 13,
@@ -80,10 +81,7 @@ class ExampleApp extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: const Text(
               'Questo è il titolo del sondaggio. Questo è il titolo del sondaggio. Questo è il titolo del sondaggio.',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ),
           totalPolls: 100,

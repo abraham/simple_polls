@@ -1,5 +1,5 @@
 /// This library provides a simple polling widget with language localizations.
-library simple_polls;
+library;
 
 /// The following export statement exports models file contains the models need to be passed to the polling widget.
 export 'models/poll_models.dart';

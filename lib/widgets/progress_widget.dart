@@ -1,4 +1,4 @@
-/// This file contains a custom linear progress indicator.
+// This file contains a custom linear progress indicator.
 import 'package:flutter/material.dart';
 
 class CustomLinearProgressBar extends StatelessWidget {
@@ -7,11 +7,11 @@ class CustomLinearProgressBar extends StatelessWidget {
   final Color? color;
   final double height;
   const CustomLinearProgressBar({
-    Key? key,
+    super.key,
     this.value = 0,
     this.color,
     this.height = 35,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

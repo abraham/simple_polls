@@ -50,22 +50,31 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
         Text(
           '${widget.model.totalPolls} ${pollsTranslation[widget.languageCode]!}',
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
 
         /// A poll without an [endTime] never ends, so there is nothing to show here.
         if (endTime != null) ...[
-          const Text(
+          Text(
             ' • ',
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           Text(
             widget.model.hasEnded
                 ? pollingEndedTranslation[widget.languageCode]!
                 : '${endsTranslation[widget.languageCode]!}: ${timeago.format(endTime, allowFromNow: true, locale: widget.languageCode)}',
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
 
@@ -75,10 +84,13 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
         if ((widget.model.editablePoll == true) &&
             (widget.model.hasVoted == true) &&
             widget.model.isActive) ...[
-          const Text(
+          Text(
             ' • ',
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           GestureDetector(
             onTap: widget.onUndo,
@@ -86,7 +98,7 @@ class _PollStatusWidgetState extends State<PollStatusWidget> {
               undoPollTranslation[widget.languageCode]!,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 13,
               ),
             ),

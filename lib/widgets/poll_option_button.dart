@@ -1,5 +1,5 @@
 // This file contains the button used to render a single, votable poll option.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PollOptionButton extends StatelessWidget {
   /// This class does not have state that's why created as stateless.

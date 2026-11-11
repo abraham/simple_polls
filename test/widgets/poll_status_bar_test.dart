@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_polls/locale/poll_locale.dart';
 import 'package:simple_polls/widgets/poll_status_bar.dart';
 

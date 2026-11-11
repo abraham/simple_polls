@@ -1,7 +1,7 @@
 // This file contains the main widget used to render a poll.
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
 import '../models/poll_models.dart';

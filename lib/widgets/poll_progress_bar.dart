@@ -1,5 +1,5 @@
 // This file contains a custom linear progress indicator.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PollProgressBar extends StatelessWidget {
   /// This class will return a widget that will show the percentage of votes of each option in bar representation.

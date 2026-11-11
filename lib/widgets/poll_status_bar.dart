@@ -1,5 +1,5 @@
 // This file contains the widget which will appear below the options widget.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
 

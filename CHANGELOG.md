@@ -1,3 +1,7 @@
+## Unreleased
+
+* Switched to `material_ui`.
+
 ## 2.0.0
 
 * BREAKING: API redesign

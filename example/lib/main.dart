@@ -1,7 +1,7 @@
 // This file contains the example showing how to use the poll widget in your application.
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_polls/simple_polls.dart';
 
 void main() {

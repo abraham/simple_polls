@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_polls/simple_polls.dart';
 
 /// A tiny host-app stand-in that owns [Poll]/[PollVote] state the way a real

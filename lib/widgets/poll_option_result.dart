@@ -1,5 +1,5 @@
 // This file contains the results widget for a single poll option.
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'poll_progress_bar.dart';
 

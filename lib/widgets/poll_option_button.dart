@@ -1,22 +1,18 @@
 // This file contains the button used to render a single, votable poll option.
 import 'package:material_ui/material_ui.dart';
 
+import '../style/poll_style.dart';
+import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 
 class PollOptionButton extends StatelessWidget {
-  /// This class does not have state that's why created as stateless.
   final String label;
-  final TextStyle? textStyle;
   final VoidCallback onPressed;
+  final PollStyle style;
 
-  /// Overrides the variant's default shape in every state.
-  final OutlinedBorder? shape;
-  final StyleVariant variant;
-
-  /// When true, the button shows a selection indicator, filled if [isSelected] is true.
-  /// Used for multi-select polls where an option can be toggled before submitting.
-  final bool showSelectionIndicator;
-  final bool isSelected;
+  /// Non-null makes the option toggleable with a selection indicator, as in
+  /// multi-select polls where options are toggled before submitting.
+  final bool? isSelected;
 
   /// Shows a loading indicator while this option's vote is submitting
   /// (Expressive only).
@@ -25,28 +21,24 @@ class PollOptionButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
-    this.textStyle,
-    this.shape,
-    this.variant = StyleVariant.material3Expressive,
-    this.showSelectionIndicator = false,
-    this.isSelected = false,
+    this.style = const PollStyle(),
+    this.isSelected,
     this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return switch (variant) {
-      StyleVariant.material3 => _buildMaterial3(context),
-      StyleVariant.material3Expressive => _buildExpressive(context),
-    };
+    return style.isExpressive
+        ? _buildExpressive(context)
+        : _buildMaterial3(context);
   }
 
   Widget _buildExpressive(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selected = showSelectionIndicator && isSelected;
+    final selected = isSelected ?? false;
     final Widget? leading = isLoading
         ? const PollShapeLoader()
-        : showSelectionIndicator
+        : isSelected != null
         ? PollSelectionIndicator(
             selected: selected,
             color: selected ? colors.onPrimary : colors.primary,
@@ -58,11 +50,11 @@ class PollOptionButton extends StatelessWidget {
       variant: StyleVariant.material3Expressive,
       child: ElevatedButton(
         onPressed: onPressed,
-        isSelected: showSelectionIndicator ? isSelected : null,
+        isSelected: isSelected,
         style: ElevatedButton.styleFrom(
           sizeVariant: ButtonSizeVariant.medium,
-          shape: shape,
-          textStyle: textStyle,
+          shape: style.effectiveOptionShape,
+          textStyle: style.optionTextStyle,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -76,34 +68,23 @@ class PollOptionButton extends StatelessWidget {
   }
 
   Widget _buildMaterial3(BuildContext context) {
-    final showIndicator = showSelectionIndicator && isSelected;
+    final colors = Theme.of(context).colorScheme;
+    final selected = isSelected ?? false;
     return OutlinedButton(
-      /// Calls the passed callback to capture response.
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        backgroundColor: showIndicator
-            ? Theme.of(context).colorScheme.primaryContainer
-            : null,
-        shape: shape ?? const StadiumBorder(),
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.primary,
-          width: 1.5,
-        ),
-
-        /// Custom theme will be applied here.
-        /// First it checks the passed parameter , if [textStyle] is null the default theme will be applied.
-        textStyle: textStyle ?? Theme.of(context).textTheme.labelLarge,
+        foregroundColor: colors.primary,
+        backgroundColor: selected ? colors.primaryContainer : null,
+        shape: style.effectiveOptionShape,
+        side: BorderSide(color: colors.primary, width: 1.5),
+        textStyle:
+            style.optionTextStyle ?? Theme.of(context).textTheme.labelLarge,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (showIndicator) ...[
-            Icon(
-              Icons.check_circle,
-              size: 16,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          if (selected) ...[
+            Icon(Icons.check_circle, size: 16, color: colors.primary),
             const SizedBox(width: 6),
           ],
           Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),

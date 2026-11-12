@@ -3,22 +3,18 @@ import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 
+import '../style/poll_style.dart';
+import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 
 class PollProgressBar extends StatelessWidget {
   /// This class will return a widget that will show the percentage of votes of each option in bar representation.
   final double value;
-  final Color? color;
-
-  /// Defaults to 30 for Expressive and 35 for Material 3.
-  final double? height;
-  final StyleVariant variant;
+  final PollStyle style;
   const PollProgressBar({
     super.key,
     this.value = 0,
-    this.color,
-    this.height,
-    this.variant = StyleVariant.material3Expressive,
+    this.style = const PollStyle(),
   });
 
   static const activeKey = ValueKey<String>('poll-progress-active');
@@ -26,17 +22,16 @@ class PollProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (variant) {
-      StyleVariant.material3 => _buildMaterial3(context),
-      StyleVariant.material3Expressive => _buildExpressive(context),
-    };
+    return style.isExpressive
+        ? _buildExpressive(context)
+        : _buildMaterial3(context);
   }
 
   /// Rounded active segment, a gap, then the track with a stop dot at its end.
   Widget _buildExpressive(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final activeColor = color ?? colors.primary;
-    final barHeight = height ?? 30;
+    final activeColor = style.progressBarColor ?? colors.primary;
+    final barHeight = style.effectiveProgressBarHeight;
     final radius = BorderRadius.circular(barHeight / 2);
     final stopSize = math.min(barHeight / 3, 6.0);
     return SizedBox(
@@ -92,7 +87,7 @@ class PollProgressBar extends StatelessWidget {
   }
 
   Widget _buildMaterial3(BuildContext context) {
-    final barHeight = height ?? 35;
+    final barHeight = style.effectiveProgressBarHeight;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraint) {
         return Row(
@@ -102,7 +97,9 @@ class PollProgressBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(3),
 
                 /// If [color] of bar is null default color will be applied.
-                color: color ?? Theme.of(context).colorScheme.primaryContainer,
+                color:
+                    style.progressBarColor ??
+                    Theme.of(context).colorScheme.primaryContainer,
               ),
               height: barHeight,
 

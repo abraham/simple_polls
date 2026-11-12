@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:simple_polls/simple_polls.dart';
 import 'package:simple_polls/widgets/poll_expressive.dart';
 import 'package:simple_polls/widgets/poll_option_result.dart';
 
@@ -16,7 +17,7 @@ Widget _result({
         percentage: percentage,
         isSelected: isSelected,
         isLeading: isLeading,
-        variant: variant,
+        style: PollStyle(variant: variant),
       ),
     ),
   );

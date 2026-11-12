@@ -1,43 +1,50 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:simple_polls/locale/poll_locale.dart';
+import 'package:simple_polls/simple_polls.dart';
 import 'package:simple_polls/widgets/poll_status_bar.dart';
 
-void main() {
-  testWidgets('shows undo button only when showUndo is true', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PollStatusBar(
-            totalVotes: 3,
-            locale: PollLocale.en,
-            endsAt: DateTime.now().toUtc().add(const Duration(days: 1)),
-            showUndo: true,
-            onUndo: () {},
-          ),
+Widget _bar({
+  int votes = 1,
+  DateTime? endsAt,
+  bool showUndo = false,
+  VoidCallback? onUndo,
+  StyleVariant variant = StyleVariant.material3Expressive,
+}) {
+  return MaterialApp(
+    home: Scaffold(
+      body: PollStatusBar(
+        poll: Poll<int>(
+          title: 'Question?',
+          endsAt: endsAt,
+          options: [PollOption(id: 1, label: 'A', voteCount: votes)],
         ),
+        locale: PollLocale.en,
+        showUndo: showUndo,
+        onUndo: onUndo ?? () {},
+        style: PollStyle(variant: variant),
       ),
-    );
+    ),
+  );
+}
+
+void main() {
+  final tomorrow = DateTime.now().toUtc().add(const Duration(days: 1));
+
+  testWidgets('shows undo button only when showUndo is true', (tester) async {
+    await tester.pumpWidget(_bar(votes: 3, endsAt: tomorrow, showUndo: true));
 
     expect(find.text('3 votes'), findsOneWidget);
     expect(find.text('undo'), findsOneWidget);
+
+    await tester.pumpWidget(_bar(votes: 3, endsAt: tomorrow));
+    expect(find.text('undo'), findsNothing);
   });
 
   testWidgets('calls onUndo when undo is tapped', (tester) async {
     var undone = false;
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PollStatusBar(
-            totalVotes: 1,
-            locale: PollLocale.en,
-            endsAt: DateTime.now().toUtc().add(const Duration(days: 1)),
-            showUndo: true,
-            onUndo: () => undone = true,
-          ),
-        ),
-      ),
+      _bar(endsAt: tomorrow, showUndo: true, onUndo: () => undone = true),
     );
 
     await tester.tap(find.text('undo'));
@@ -49,19 +56,7 @@ void main() {
       tester,
     ) async {
       final semantics = tester.ensureSemantics();
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PollStatusBar(
-              totalVotes: 1,
-              locale: PollLocale.en,
-              showUndo: true,
-              onUndo: () {},
-              variant: variant,
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(_bar(showUndo: true, variant: variant));
 
       expect(
         tester.getSemantics(find.text('undo')),
@@ -74,31 +69,16 @@ void main() {
   testWidgets('hides the ends/ended text when endsAt is omitted', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: PollStatusBar(totalVotes: 2, locale: PollLocale.en),
-        ),
-      ),
-    );
+    await tester.pumpWidget(_bar(votes: 2));
 
     expect(find.text('2 votes'), findsOneWidget);
     expect(find.textContaining('Ends'), findsNothing);
     expect(find.text('Polling Ended'), findsNothing);
   });
 
-  testWidgets('shows the ended label once hasEnded is true', (tester) async {
+  testWidgets('shows the ended label once the poll has ended', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PollStatusBar(
-            totalVotes: 2,
-            locale: PollLocale.en,
-            endsAt: DateTime.now().toUtc().subtract(const Duration(days: 1)),
-            hasEnded: true,
-          ),
-        ),
-      ),
+      _bar(endsAt: DateTime.now().toUtc().subtract(const Duration(days: 1))),
     );
 
     expect(find.text('Polling Ended'), findsOneWidget);

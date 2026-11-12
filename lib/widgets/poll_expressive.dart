@@ -106,7 +106,7 @@ OutlinedBorder _morph(MaterialShapeBorder a, MaterialShapeBorder b, double t) {
 }
 
 /// A [MaterialShapes] shape filled with [color], with an optional centered
-/// [icon].
+/// [icon]. Hidden from screen readers unless [semanticLabel] is set.
 class PollShapeBadge extends StatelessWidget {
   const PollShapeBadge({
     super.key,
@@ -114,6 +114,7 @@ class PollShapeBadge extends StatelessWidget {
     required this.color,
     this.icon,
     this.iconColor,
+    this.semanticLabel,
     this.size = 20,
   });
 
@@ -121,20 +122,26 @@ class PollShapeBadge extends StatelessWidget {
   final Color color;
   final IconData? icon;
   final Color? iconColor;
+  final String? semanticLabel;
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: size,
-      child: DecoratedBox(
-        decoration: ShapeDecoration(
-          color: color,
-          shape: MaterialShapeBorder(shape: shape),
+    return Semantics(
+      label: semanticLabel,
+      child: ExcludeSemantics(
+        child: SizedBox.square(
+          dimension: size,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              color: color,
+              shape: MaterialShapeBorder(shape: shape),
+            ),
+            child: icon == null
+                ? null
+                : Icon(icon, size: size * 0.6, color: iconColor),
+          ),
         ),
-        child: icon == null
-            ? null
-            : Icon(icon, size: size * 0.6, color: iconColor),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:simple_polls/simple_polls.dart';
 import 'package:simple_polls/widgets/poll_expressive.dart';
 import 'package:simple_polls/widgets/poll_option_button.dart';
 
@@ -13,8 +14,7 @@ Widget _button({
       body: PollOptionButton(
         label: 'Option A',
         onPressed: onPressed ?? () {},
-        variant: variant,
-        showSelectionIndicator: true,
+        style: PollStyle(variant: variant),
         isSelected: isSelected,
       ),
     ),

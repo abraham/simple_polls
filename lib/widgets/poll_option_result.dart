@@ -2,6 +2,8 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
+import '../style/poll_style.dart';
+import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 import 'poll_progress_bar.dart';
 
@@ -13,10 +15,7 @@ class PollOptionResult extends StatelessWidget {
 
   /// True for the option(s) with the most votes (Expressive only).
   final bool isLeading;
-  final TextStyle? textStyle;
-  final Color? progressBarColor;
-  final double? progressBarHeight;
-  final StyleVariant variant;
+  final PollStyle style;
   final PollLocale locale;
   const PollOptionResult({
     super.key,
@@ -24,10 +23,7 @@ class PollOptionResult extends StatelessWidget {
     required this.percentage,
     this.isSelected = false,
     this.isLeading = false,
-    this.textStyle,
-    this.progressBarColor,
-    this.progressBarHeight,
-    this.variant = StyleVariant.material3Expressive,
+    this.style = const PollStyle(),
     this.locale = PollLocale.en,
   });
 
@@ -38,10 +34,9 @@ class PollOptionResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (variant) {
-      StyleVariant.material3 => _buildMaterial3(context),
-      StyleVariant.material3Expressive => _buildExpressive(context),
-    };
+    return style.isExpressive
+        ? _buildExpressive(context)
+        : _buildMaterial3(context);
   }
 
   Widget _buildExpressive(BuildContext context) {
@@ -61,7 +56,7 @@ class PollOptionResult extends StatelessWidget {
                       label,
                       overflow: TextOverflow.ellipsis,
                       style:
-                          textStyle ??
+                          style.optionTextStyle ??
                           textTheme.titleSmall?.copyWith(
                             color: colors.onSurface,
                             fontWeight: isSelected ? FontWeight.w700 : null,
@@ -70,16 +65,12 @@ class PollOptionResult extends StatelessWidget {
                   ),
                   if (isSelected) ...[
                     const SizedBox(width: 8),
-                    Semantics(
-                      label: locale.selectedLabel,
-                      child: ExcludeSemantics(
-                        child: PollShapeBadge(
-                          shape: selectedBadgeShape,
-                          color: colors.primary,
-                          icon: Icons.check,
-                          iconColor: colors.onPrimary,
-                        ),
-                      ),
+                    PollShapeBadge(
+                      shape: selectedBadgeShape,
+                      color: colors.primary,
+                      icon: Icons.check,
+                      iconColor: colors.onPrimary,
+                      semanticLabel: locale.selectedLabel,
                     ),
                   ],
                 ],
@@ -87,16 +78,12 @@ class PollOptionResult extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             if (isLeading) ...[
-              Semantics(
-                label: locale.leadingLabel,
-                child: ExcludeSemantics(
-                  child: PollShapeBadge(
-                    shape: leadingBadgeShape,
-                    color: colors.tertiaryContainer,
-                    icon: Icons.star_rounded,
-                    iconColor: colors.onTertiaryContainer,
-                  ),
-                ),
+              PollShapeBadge(
+                shape: leadingBadgeShape,
+                color: colors.tertiaryContainer,
+                icon: Icons.star_rounded,
+                iconColor: colors.onTertiaryContainer,
+                semanticLabel: locale.leadingLabel,
               ),
               const SizedBox(width: 6),
             ],
@@ -109,11 +96,7 @@ class PollOptionResult extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
-        PollProgressBar(
-          value: percentage,
-          color: progressBarColor,
-          height: progressBarHeight,
-        ),
+        PollProgressBar(value: percentage, style: style),
       ],
     );
   }
@@ -128,12 +111,7 @@ class PollOptionResult extends StatelessWidget {
         alignment: Alignment.centerLeft,
         children: [
           /// PollProgressBar is a widget that works like a progress bar but will be static.
-          PollProgressBar(
-            value: percentage,
-            color: progressBarColor,
-            height: progressBarHeight,
-            variant: StyleVariant.material3,
-          ),
+          PollProgressBar(value: percentage, style: style),
 
           /// This will create the label of the option in results screen.
           Row(
@@ -145,7 +123,7 @@ class PollOptionResult extends StatelessWidget {
                     label,
                     overflow: TextOverflow.ellipsis,
                     style:
-                        textStyle ??
+                        style.optionTextStyle ??
                         Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,

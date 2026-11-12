@@ -26,8 +26,7 @@ class Poll<T extends Object> {
       options.fold(0, (total, option) => total + option.voteCount);
 
   /// True only when [endsAt] is set and already in the past. A poll with no [endsAt] never ends.
-  bool get hasEnded =>
-      endsAt != null && endsAt!.toUtc().isBefore(DateTime.now().toUtc());
+  bool get hasEnded => endsAt?.isBefore(DateTime.now()) ?? false;
 
   /// True when the poll can still accept votes: either it has no [endsAt], or [endsAt] is still in the future.
   bool get isActive => !hasEnded;
@@ -59,16 +58,15 @@ class Poll<T extends Object> {
     final previousIds = previousVote?.selectedOptionIds ?? const {};
     final newIds = newVote?.selectedOptionIds ?? const {};
     return copyWith(
-      options: options.map((option) {
-        var voteCount = option.voteCount;
-        if (previousIds.contains(option.id) && !newIds.contains(option.id)) {
-          voteCount -= 1;
-        } else if (!previousIds.contains(option.id) &&
-            newIds.contains(option.id)) {
-          voteCount += 1;
-        }
-        return option.copyWith(voteCount: voteCount);
-      }).toList(),
+      options: [
+        for (final option in options)
+          option.copyWith(
+            voteCount:
+                option.voteCount +
+                (newIds.contains(option.id) ? 1 : 0) -
+                (previousIds.contains(option.id) ? 1 : 0),
+          ),
+      ],
     );
   }
 }

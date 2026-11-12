@@ -1,19 +1,12 @@
-/// This library provides a simple polling widget with language localizations.
+/// A poll widget with Material 3 Expressive styling and built-in locales.
 library;
-
-/// The following export statement exports the models needed to build a poll.
-export 'models/poll_models.dart';
-
-/// The following export statement exports the poll widget style options.
-export 'style/poll_style.dart';
 
 export 'package:material_ui/material_ui.dart' show StyleVariant;
 
-/// The following export statement exports the built-in poll locales.
 export 'locale/poll_locale.dart';
+export 'models/poll_models.dart';
 
-/// The following export statement exports the main polling widget file.
-export 'widgets/simple_poll.dart';
-
-/// Preview examples for Flutter's widget preview tooling.
+/// Lets Flutter's widget previewer find the previews.
 export 'simple_polls_previews.dart';
+export 'style/poll_style.dart';
+export 'widgets/simple_poll.dart';

@@ -4,17 +4,13 @@ import 'dart:math' as math;
 import 'package:flutter/physics.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Applies [variant] to the [ElevatedButton]s in [child], keeping the
-/// ambient button style.
-Widget pollButtonTheme(
-  BuildContext context, {
-  required StyleVariant variant,
-  required Widget child,
-}) {
+/// Makes the [ElevatedButton]s in [child] Expressive, keeping the ambient
+/// button style.
+Widget expressiveButtonTheme(BuildContext context, {required Widget child}) {
   return ElevatedButtonTheme(
     data: ElevatedButtonThemeData(
       style: ElevatedButtonTheme.of(context).style,
-      variant: variant,
+      variant: StyleVariant.material3Expressive,
     ),
     child: child,
   );
@@ -106,7 +102,7 @@ OutlinedBorder _morph(MaterialShapeBorder a, MaterialShapeBorder b, double t) {
 }
 
 /// A [MaterialShapes] shape filled with [color], with an optional centered
-/// [icon].
+/// [icon]. Hidden from screen readers unless [semanticLabel] is set.
 class PollShapeBadge extends StatelessWidget {
   const PollShapeBadge({
     super.key,
@@ -114,6 +110,7 @@ class PollShapeBadge extends StatelessWidget {
     required this.color,
     this.icon,
     this.iconColor,
+    this.semanticLabel,
     this.size = 20,
   });
 
@@ -121,20 +118,26 @@ class PollShapeBadge extends StatelessWidget {
   final Color color;
   final IconData? icon;
   final Color? iconColor;
+  final String? semanticLabel;
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: size,
-      child: DecoratedBox(
-        decoration: ShapeDecoration(
-          color: color,
-          shape: MaterialShapeBorder(shape: shape),
+    return Semantics(
+      label: semanticLabel,
+      child: ExcludeSemantics(
+        child: SizedBox.square(
+          dimension: size,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              color: color,
+              shape: MaterialShapeBorder(shape: shape),
+            ),
+            child: icon == null
+                ? null
+                : Icon(icon, size: size * 0.6, color: iconColor),
+          ),
         ),
-        child: icon == null
-            ? null
-            : Icon(icon, size: size * 0.6, color: iconColor),
       ),
     );
   }
@@ -148,16 +151,15 @@ class PollSelectionIndicator extends StatelessWidget {
     required this.selected,
     required this.color,
     required this.checkColor,
-    this.size = 22,
   });
 
   static final RoundedPolygon unselectedShape = MaterialShapes.circle;
   static final RoundedPolygon selectedShape = MaterialShapes.cookie9Sided;
+  static const double _size = 22;
 
   final bool selected;
   final Color color;
   final Color checkColor;
-  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +177,7 @@ class PollSelectionIndicator extends StatelessWidget {
           t,
         );
         return SizedBox.square(
-          dimension: size,
+          dimension: _size,
           child: DecoratedBox(
             decoration: ShapeDecoration(
               color: color.withValues(alpha: color.a * t),
@@ -183,7 +185,7 @@ class PollSelectionIndicator extends StatelessWidget {
             ),
             child: Opacity(
               opacity: t,
-              child: Icon(Icons.check, size: size * 0.65, color: checkColor),
+              child: Icon(Icons.check, size: _size * 0.65, color: checkColor),
             ),
           ),
         );
@@ -192,16 +194,13 @@ class PollSelectionIndicator extends StatelessWidget {
   }
 }
 
-/// A Material 3 Expressive style loading indicator that spins while
-/// morphing through [MaterialShapes]. Shows a still shape when animations
-/// are disabled.
+/// A Material 3 Expressive style loading indicator in the ambient [IconTheme]
+/// color that spins while morphing through [MaterialShapes]. Shows a still
+/// shape when animations are disabled.
 class PollShapeLoader extends StatefulWidget {
-  const PollShapeLoader({super.key, this.size = 20, this.color});
+  const PollShapeLoader({super.key});
 
-  final double size;
-
-  /// Defaults to the ambient [IconTheme] color.
-  final Color? color;
+  static const double _size = 20;
 
   static final List<RoundedPolygon> shapes = [
     MaterialShapes.softBurst,
@@ -244,10 +243,10 @@ class _PollShapeLoaderState extends State<PollShapeLoader>
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.color ?? IconTheme.of(context).color!;
+    final color = IconTheme.of(context).color!;
     final shapes = PollShapeLoader.shapes;
     return SizedBox.square(
-      dimension: widget.size,
+      dimension: PollShapeLoader._size,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {

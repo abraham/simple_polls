@@ -1,11 +1,13 @@
-// This file contains the main widget used to render a poll.
 import 'dart:async';
+import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
 import '../models/poll_models.dart';
 import '../style/poll_style.dart';
+import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 import 'poll_option_button.dart';
 import 'poll_option_result.dart';
@@ -76,9 +78,9 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
   void didUpdateWidget(covariant SimplePoll<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final newVote = widget.vote;
-    final isNewPoll = !_haveSameOptionIds(
-      widget.poll.options,
-      oldWidget.poll.options,
+    final isNewPoll = !listEquals(
+      [for (final option in widget.poll.options) option.id],
+      [for (final option in oldWidget.poll.options) option.id],
     );
     if (isNewPoll) {
       /// A genuinely different poll (different options) always resets any draft.
@@ -96,18 +98,10 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
     }
   }
 
-  bool _haveSameOptionIds(List<PollOption<T>> a, List<PollOption<T>> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i].id != b[i].id) return false;
-    }
-    return true;
-  }
-
   void _scheduleEndTimer() {
     final endsAt = widget.poll.endsAt;
     if (endsAt != null && widget.poll.isActive) {
-      _endTimer = Timer(endsAt.toUtc().difference(DateTime.now().toUtc()), () {
+      _endTimer = Timer(endsAt.difference(DateTime.now()), () {
         if (mounted) setState(() {});
       });
     }
@@ -165,9 +159,6 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
     final poll = widget.poll;
     final vote = widget.vote;
     final style = widget.style;
-    final expressive = style.variant == StyleVariant.material3Expressive;
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final hasVoted = vote != null && vote.selectedOptionIds.isNotEmpty;
     final showResults = hasVoted || poll.hasEnded;
 
@@ -175,64 +166,35 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
       key: ValueKey<bool>(showResults),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
+      spacing: 8,
       children: _buildOptions(showResults: showResults),
     );
 
     return Container(
       margin: style.margin,
-      padding:
-          style.padding ??
-          (expressive
-              ? const EdgeInsets.fromLTRB(16, 16, 16, 12)
-              : const EdgeInsets.fromLTRB(15, 15, 15, 5)),
-      decoration:
-          style.decoration ??
-          (expressive
-              ? ShapeDecoration(
-                  color: colors.surfaceContainer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        style.containerRadius ??
-                        const BorderRadius.all(Radius.circular(28)),
-                  ),
-                )
-              : BoxDecoration(
-                  border: Border.all(color: Theme.of(context).dividerColor),
-                  color: colors.surface,
-                )),
+      padding: style.effectivePadding,
+      decoration: style.effectiveDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
           widget.titleBuilder?.call(context) ??
-              Text(
-                poll.title,
-                style: expressive
-                    ? textTheme.titleMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w600,
-                      )
-                    : textTheme.titleSmall?.copyWith(color: colors.onSurface),
-              ),
-          SizedBox(height: expressive ? 16 : 10),
-          if (expressive) _animateSwitch(context, options) else options,
-          SizedBox(height: expressive ? 12 : 5),
-
-          /// For multi-select polls, show a submit button to cast the vote for all toggled options.
+              Text(poll.title, style: style.titleStyle(context)),
+          SizedBox(height: style.titleGap),
+          if (style.isExpressive) _animateSwitch(context, options) else options,
+          SizedBox(height: style.optionsGap),
           if (poll.allowsMultipleAnswers && !showResults)
             Padding(
-              padding: EdgeInsets.only(bottom: expressive ? 8 : 5),
-              child: _buildVoteButton(context, expressive: expressive),
+              padding: EdgeInsets.only(bottom: style.voteButtonGap),
+              child: _buildVoteButton(context),
             ),
 
           PollStatusBar(
-            totalVotes: poll.totalVotes,
+            poll: poll,
             locale: widget.locale,
-            endsAt: poll.endsAt,
-            hasEnded: poll.hasEnded,
             showUndo: poll.isEditable && hasVoted && poll.isActive,
             onUndo: _undo,
-            variant: style.variant,
+            style: style,
           ),
         ],
       ),
@@ -241,74 +203,52 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
 
   List<Widget> _buildOptions({required bool showResults}) {
     final poll = widget.poll;
-    final style = widget.style;
-    final maxVotes = poll.options.fold(
-      0,
-      (max, option) => option.voteCount > max ? option.voteCount : max,
-    );
+    final maxVotes = poll.options
+        .map((option) => option.voteCount)
+        .fold(0, math.max);
 
-    /// This list will generate all the necessary poll options.
-    return List.generate(poll.options.length, (index) {
-      final option = poll.options[index];
-      final Widget optionWidget;
-      if (showResults) {
-        /// Check for 0/0 is present to avoid a division by zero.
-        final percentage = poll.totalVotes == 0
-            ? 0.0
-            : option.voteCount / poll.totalVotes;
-        optionWidget = PollOptionResult(
-          label: option.label,
-          percentage: percentage,
-          isSelected:
-              widget.vote?.selectedOptionIds.contains(option.id) ?? false,
-          isLeading: maxVotes > 0 && option.voteCount == maxVotes,
-          textStyle: style.optionTextStyle,
-          progressBarColor: style.progressBarColor,
-          progressBarHeight: style.progressBarHeight,
-          variant: style.variant,
-          locale: widget.locale,
-        );
-      } else if (poll.allowsMultipleAnswers) {
-        /// In multi-select mode, tapping only toggles the option; the vote is submitted separately.
-        optionWidget = PollOptionButton(
-          label: option.label,
-          textStyle: style.optionTextStyle,
-          shape: style.optionShape,
-          variant: style.variant,
-          showSelectionIndicator: true,
-          isSelected: _pendingSelection.contains(option.id),
-          onPressed: () => _toggleMultiple(option.id),
-        );
-      } else {
-        optionWidget = PollOptionButton(
-          label: option.label,
-          textStyle: style.optionTextStyle,
-          shape: style.optionShape,
-          variant: style.variant,
-          isLoading: _isSubmitting && _submittingOptionId == option.id,
-          onPressed: () => _selectSingle(option.id),
-        );
-      }
-
-      /// Adds a gap above every option except the first so buttons/results aren't flush against each other.
-      return index == 0
-          ? optionWidget
-          : Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: optionWidget,
-            );
-    });
+    return [
+      for (final option in poll.options)
+        if (showResults)
+          PollOptionResult(
+            label: option.label,
+            percentage: poll.totalVotes == 0
+                ? 0.0
+                : option.voteCount / poll.totalVotes,
+            isSelected:
+                widget.vote?.selectedOptionIds.contains(option.id) ?? false,
+            isLeading: maxVotes > 0 && option.voteCount == maxVotes,
+            style: widget.style,
+            locale: widget.locale,
+          )
+        else if (poll.allowsMultipleAnswers)
+          // Multi-select only toggles; the Vote button submits.
+          PollOptionButton(
+            label: option.label,
+            style: widget.style,
+            isSelected: _pendingSelection.contains(option.id),
+            onPressed: () => _toggleMultiple(option.id),
+          )
+        else
+          PollOptionButton(
+            label: option.label,
+            style: widget.style,
+            isLoading: _isSubmitting && _submittingOptionId == option.id,
+            onPressed: () => _selectSingle(option.id),
+          ),
+    ];
   }
 
-  Widget _buildVoteButton(BuildContext context, {required bool expressive}) {
+  Widget _buildVoteButton(BuildContext context) {
     final onPressed = _pendingSelection.isNotEmpty && !_isSubmitting
         ? _submitMultiple
         : null;
     final label = Text(widget.locale.voteButtonLabel);
-    if (!expressive) return ElevatedButton(onPressed: onPressed, child: label);
-    return pollButtonTheme(
+    if (!widget.style.isExpressive) {
+      return ElevatedButton(onPressed: onPressed, child: label);
+    }
+    return expressiveButtonTheme(
       context,
-      variant: StyleVariant.material3Expressive,
       child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(sizeVariant: ButtonSizeVariant.medium),

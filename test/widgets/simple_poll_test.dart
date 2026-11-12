@@ -195,7 +195,8 @@ void main() {
           // Both options should still be pre-selected instead of resetting empty.
           expect(
             find.byWidgetPredicate(
-              (widget) => widget is PollOptionButton && widget.isSelected,
+              (widget) =>
+                  widget is PollOptionButton && widget.isSelected == true,
             ),
             findsNWidgets(2),
           );

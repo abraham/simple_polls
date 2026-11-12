@@ -1,4 +1,3 @@
-// This file contains the button used to render a single, votable poll option.
 import 'package:material_ui/material_ui.dart';
 
 import '../style/poll_style.dart';
@@ -45,9 +44,8 @@ class PollOptionButton extends StatelessWidget {
             checkColor: colors.primary,
           )
         : null;
-    return pollButtonTheme(
+    return expressiveButtonTheme(
       context,
-      variant: StyleVariant.material3Expressive,
       child: ElevatedButton(
         onPressed: onPressed,
         isSelected: isSelected,

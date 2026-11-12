@@ -1,4 +1,3 @@
-// This file contains the widget which will appear below the options widget.
 import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
@@ -7,9 +6,8 @@ import '../style/poll_style.dart';
 import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 
+/// Vote count, time left or ended, and Undo, below the options.
 class PollStatusBar extends StatelessWidget {
-  /// This widget will show status of the poll.
-  /// It shows total votes, time remaining in polling and undo button (if poll is editable).
   final Poll<Object> poll;
   final PollLocale locale;
   final bool showUndo;
@@ -44,7 +42,6 @@ class PollStatusBar extends StatelessWidget {
           style: textStyle,
         ),
 
-        /// A poll without an [endsAt] never ends, so there is nothing to show here.
         if (endsAt != null) ...[
           separator,
           if (hasEnded && expressive) ...[
@@ -60,17 +57,13 @@ class PollStatusBar extends StatelessWidget {
           ),
         ],
 
-        /// [showUndo] is only true when the poll is editable, the user has voted, and the poll hasn't ended.
         if (showUndo) ...[
           separator,
-          if (expressive)
-            TextButton.icon(
-              onPressed: onUndo,
-              icon: const Icon(Icons.undo, size: 18),
-              label: Text(locale.undoLabel),
-            )
-          else
-            TextButton(onPressed: onUndo, child: Text(locale.undoLabel)),
+          TextButton.icon(
+            onPressed: onUndo,
+            icon: expressive ? const Icon(Icons.undo, size: 18) : null,
+            label: Text(locale.undoLabel),
+          ),
         ],
       ],
     );

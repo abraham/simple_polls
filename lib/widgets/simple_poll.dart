@@ -1,6 +1,7 @@
-// This file contains the main widget used to render a poll.
 import 'dart:async';
+import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
@@ -77,9 +78,9 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
   void didUpdateWidget(covariant SimplePoll<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final newVote = widget.vote;
-    final isNewPoll = !_haveSameOptionIds(
-      widget.poll.options,
-      oldWidget.poll.options,
+    final isNewPoll = !listEquals(
+      [for (final option in widget.poll.options) option.id],
+      [for (final option in oldWidget.poll.options) option.id],
     );
     if (isNewPoll) {
       /// A genuinely different poll (different options) always resets any draft.
@@ -97,18 +98,10 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
     }
   }
 
-  bool _haveSameOptionIds(List<PollOption<T>> a, List<PollOption<T>> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i].id != b[i].id) return false;
-    }
-    return true;
-  }
-
   void _scheduleEndTimer() {
     final endsAt = widget.poll.endsAt;
     if (endsAt != null && widget.poll.isActive) {
-      _endTimer = Timer(endsAt.toUtc().difference(DateTime.now().toUtc()), () {
+      _endTimer = Timer(endsAt.difference(DateTime.now()), () {
         if (mounted) setState(() {});
       });
     }
@@ -190,8 +183,6 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
           SizedBox(height: style.titleGap),
           if (style.isExpressive) _animateSwitch(context, options) else options,
           SizedBox(height: style.optionsGap),
-
-          /// For multi-select polls, show a submit button to cast the vote for all toggled options.
           if (poll.allowsMultipleAnswers && !showResults)
             Padding(
               padding: EdgeInsets.only(bottom: style.voteButtonGap),
@@ -212,18 +203,15 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
 
   List<Widget> _buildOptions({required bool showResults}) {
     final poll = widget.poll;
-    final maxVotes = poll.options.fold(
-      0,
-      (max, option) => option.voteCount > max ? option.voteCount : max,
-    );
+    final maxVotes = poll.options
+        .map((option) => option.voteCount)
+        .fold(0, math.max);
 
     return [
       for (final option in poll.options)
         if (showResults)
           PollOptionResult(
             label: option.label,
-
-            /// Check for 0/0 is present to avoid a division by zero.
             percentage: poll.totalVotes == 0
                 ? 0.0
                 : option.voteCount / poll.totalVotes,
@@ -234,7 +222,7 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
             locale: widget.locale,
           )
         else if (poll.allowsMultipleAnswers)
-          /// In multi-select mode, tapping only toggles the option; the vote is submitted separately.
+          // Multi-select only toggles; the Vote button submits.
           PollOptionButton(
             label: option.label,
             style: widget.style,
@@ -259,9 +247,8 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
     if (!widget.style.isExpressive) {
       return ElevatedButton(onPressed: onPressed, child: label);
     }
-    return pollButtonTheme(
+    return expressiveButtonTheme(
       context,
-      variant: StyleVariant.material3Expressive,
       child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(sizeVariant: ButtonSizeVariant.medium),

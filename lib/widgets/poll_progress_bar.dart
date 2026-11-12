@@ -1,4 +1,4 @@
-// This file contains a custom linear progress indicator.
+// Static bar showing an option's share of the votes.
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
@@ -8,7 +8,7 @@ import '../style/poll_style_defaults.dart';
 import 'poll_expressive.dart';
 
 class PollProgressBar extends StatelessWidget {
-  /// This class will return a widget that will show the percentage of votes of each option in bar representation.
+  /// The filled fraction, from 0 to 1.
   final double value;
   final PollStyle style;
   const PollProgressBar({
@@ -87,40 +87,24 @@ class PollProgressBar extends StatelessWidget {
   }
 
   Widget _buildMaterial3(BuildContext context) {
-    final barHeight = style.effectiveProgressBarHeight;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraint) {
-        return Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-
-                /// If [color] of bar is null default color will be applied.
-                color:
-                    style.progressBarColor ??
-                    Theme.of(context).colorScheme.primaryContainer,
-              ),
-              height: barHeight,
-
-              /// constraint.maxWidth * value will return the width that shows the bar.
-              /// For Example : on a 400px available space and value = 0.25, bar will take 25% of the 400px available.
-              width: constraint.maxWidth * value,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              ),
-              height: barHeight,
-
-              /// constraint.maxWidth * (1 - value) will fill the remanining space with the theme's surface color.
-              /// For Example : on a 400px available space and value = 0.25, bar will take 75% of the 400px available.
-              width: constraint.maxWidth * (1 - value),
-            ),
-          ],
-        );
-      },
+    final radius = BorderRadius.circular(3);
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      height: style.effectiveProgressBarHeight,
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        color: colors.surfaceContainerHighest,
+      ),
+      child: FractionallySizedBox(
+        widthFactor: value,
+        alignment: AlignmentDirectional.centerStart,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            color: style.progressBarColor ?? colors.primaryContainer,
+          ),
+        ),
+      ),
     );
   }
 }

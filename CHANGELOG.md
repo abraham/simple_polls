@@ -10,6 +10,12 @@ Pass `PollStyle(variant: StyleVariant.material3)` to keep the 2.x look.
 `PollStyle.padding` and `optionShape` are now nullable and default per
 variant.
 * Added `PollLocale.selectedLabel` and `leadingLabel` for screen readers.
+* BREAKING: `PollLocale` takes a required `languageCode` (the `timeago`
+locale) instead of a required `formatTimeRemaining` function.
+`formatTimeRemaining` is now a method; pass `timeRemainingFormatter` to
+replace the `timeago` formatting.
+* Fixed Italian and French translations: votes are "voti"/"votes" (were
+"sondaggi"/"les sondages", meaning polls) and Italian undo is "annulla".
 * Undo is now a real button (touch target and semantics) in both variants.
 * Text uses the theme's text styles instead of fixed font sizes.
 

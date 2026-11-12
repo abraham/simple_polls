@@ -44,7 +44,10 @@ Polls use Material 3 Expressive by default. For the 2.x look, pass
 
 ## Screenshots
 
-![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/en_options.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/en_results.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/it_options.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/it_results.jpg)
+|  | Options | Results |
+| --- | --- | --- |
+| English | ![English poll options](https://raw.githubusercontent.com/abraham/simple_polls/main/example/images/en_options.png) | ![English poll results](https://raw.githubusercontent.com/abraham/simple_polls/main/example/images/en_results.png) |
+| Italian | ![Italian poll options](https://raw.githubusercontent.com/abraham/simple_polls/main/example/images/it_options.png) | ![Italian poll results](https://raw.githubusercontent.com/abraham/simple_polls/main/example/images/it_results.png) |
 
 >NOTE:
 >Built-in locales are `PollLocale.en` (default), `.it`, `.fr`, `.es`, `.de`.

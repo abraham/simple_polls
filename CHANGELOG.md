@@ -1,6 +1,6 @@
-## Unreleased
+## 3.0.0
 
-* Switched to `material_ui`.
+* Switched to `material_ui`. Requires Flutter 3.47.0 or newer.
 * BREAKING: polls now use Material 3 Expressive by default: a rounded card,
 Expressive buttons whose shape morphs when pressed or selected, spring
 animated result bars, and Material shapes for the selection indicator, the

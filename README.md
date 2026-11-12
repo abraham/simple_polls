@@ -3,8 +3,9 @@
 simple_polls widget is polling widget with language localizations.
 
 > [!NOTE]
-> Version 2.0.0 is a full API redesign with breaking changes from 1.x — see
-> the [CHANGELOG](CHANGELOG.md).
+> Version 3.0.0 switches to Material 3 Expressive and `material_ui`, with
+> breaking changes to `PollStyle` and `PollLocale` — see the
+> [CHANGELOG](CHANGELOG.md).
 
 ## Example
 

@@ -44,6 +44,33 @@ void main() {
     expect(undone, isTrue);
   });
 
+  for (final variant in StyleVariant.values) {
+    testWidgets('undo is a button for screen readers (${variant.name})', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PollStatusBar(
+              totalVotes: 1,
+              locale: PollLocale.en,
+              showUndo: true,
+              onUndo: () {},
+              variant: variant,
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.text('undo')),
+        isSemantics(isButton: true, hasTapAction: true),
+      );
+      semantics.dispose();
+    });
+  }
+
   testWidgets('hides the ends/ended text when endsAt is omitted', (
     tester,
   ) async {

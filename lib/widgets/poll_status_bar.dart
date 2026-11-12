@@ -2,6 +2,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../locale/poll_locale.dart';
+import 'poll_expressive.dart';
 
 class PollStatusBar extends StatelessWidget {
   /// This widget will show status of the poll.
@@ -12,6 +13,7 @@ class PollStatusBar extends StatelessWidget {
   final bool hasEnded;
   final bool showUndo;
   final VoidCallback? onUndo;
+  final StyleVariant variant;
   const PollStatusBar({
     super.key,
     required this.totalVotes,
@@ -20,64 +22,60 @@ class PollStatusBar extends StatelessWidget {
     this.hasEnded = false,
     this.showUndo = false,
     this.onUndo,
+    this.variant = StyleVariant.material3Expressive,
   });
+
+  static final RoundedPolygon endedShape = MaterialShapes.flower;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final style = Theme.of(context).textTheme.bodySmall
+        ?.copyWith(color: colors.onSurfaceVariant);
+    final expressive = variant == StyleVariant.material3Expressive;
+    final separator = Text(' • ', style: style);
     return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           '$totalVotes ${locale.votesLabel}',
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+          style: style,
         ),
 
         /// A poll without an [endsAt] never ends, so there is nothing to show here.
         if (endsAt != null) ...[
-          Text(
-            ' • ',
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          separator,
+          if (hasEnded && expressive) ...[
+            ExcludeSemantics(
+              child: PollShapeBadge(
+                shape: endedShape,
+                color: colors.tertiary,
+                size: 14,
+              ),
             ),
-          ),
+            const SizedBox(width: 4),
+          ],
           Text(
             hasEnded
                 ? locale.pollingEndedLabel
                 : '${locale.endsLabel}: ${locale.formatTimeRemaining(endsAt!)}',
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+            style: style,
           ),
         ],
 
         /// [showUndo] is only true when the poll is editable, the user has voted, and the poll hasn't ended.
         if (showUndo) ...[
-          Text(
-            ' • ',
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          GestureDetector(
-            onTap: onUndo,
-            child: Text(
-              locale.undoLabel,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 13,
-              ),
-            ),
-          ),
+          separator,
+          if (expressive)
+            TextButton.icon(
+              onPressed: onUndo,
+              icon: const Icon(Icons.undo, size: 18),
+              label: Text(locale.undoLabel),
+            )
+          else
+            TextButton(onPressed: onUndo, child: Text(locale.undoLabel)),
         ],
       ],
     );

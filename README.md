@@ -39,6 +39,9 @@ SimplePoll<int>(
 )
 ```
 
+Polls use Material 3 Expressive by default. For the 2.x look, pass
+`style: PollStyle(variant: StyleVariant.material3)`.
+
 ## Screenshots
 
 ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/en_options.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/en_results.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/it_options.jpg) ![](https://raw.githubusercontent.com/abhay-s-rawat/simple_polls/main/example/images/it_results.jpg)

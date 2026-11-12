@@ -3,11 +3,41 @@ name: Publish
 on:
   push:
     tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+' # tag-pattern on pub.dev: 'v{{version}}'
-    - 'v[0-9]+.[0-9]+.[0-9]+-[a-z]+.[0-9]+' # tag-pattern on pub.dev: 'v{{version}}'
+      # Must match the tag pattern on pub.dev: v{{version}}
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: read
+
+env:
+  # Keep in sync with .github/workflows/ci.yml.
+  FLUTTER_VERSION: 3.47.5
 
 jobs:
   publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: pub.dev
+      url: https://pub.dev/packages/simple_polls/versions/${{ steps.version.outputs.version }}
+    concurrency:
+      group: deploy-pub.dev
+      cancel-in-progress: false
     permissions:
-      id-token: write # Required for authentication using OIDC
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      # Sets up the pub.dev OIDC token.
+      - uses: dart-lang/setup-dart@v1.8.2
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          version: ${{ env.FLUTTER_VERSION }}
+      - id: version
+        run: |
+          version=$(sed -n 's/^version: *//p' pubspec.yaml)
+          test "v$version" = "$GITHUB_REF_NAME"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: flutter pub get
+      - run: flutter pub publish --force

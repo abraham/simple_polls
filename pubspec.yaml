@@ -1,11 +1,11 @@
 name: simple_polls
 description: simple_polls widget is polling widget with language localizations.
 version: 2.0.0
-homepage: https://github.com/abhay-s-rawat/simple_polls
+repository: https://github.com/abraham/simple_polls
 
 environment:
   sdk: ^3.13.0
-  flutter: '>=3.44.0'
+  flutter: '>=3.47.0'
 
 dependencies:
   flutter:

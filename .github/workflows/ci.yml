@@ -1,9 +1,15 @@
 name: Main
 on:
   push:
+    branches: [main]
+  pull_request:
 
 permissions:
   contents: read
+
+env:
+  # Keep in sync with .github/workflows/publish.yml.
+  FLUTTER_VERSION: 3.47.5
 
 jobs:
   lint:
@@ -21,12 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: flutter-actions/setup-flutter@v4
         with:
-          version: 3.47.5
+          version: ${{ env.FLUTTER_VERSION }}
           cache: true
           cache-sdk: true
-          cache-key: ${{ hashFiles('pubspec.lock') }}
+          cache-key: ${{ hashFiles('**/pubspec.yaml') }}
       - run: flutter pub get
       - name: format
         run: dart format . --set-exit-if-changed

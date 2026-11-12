@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../locale/poll_locale.dart';
 import '../models/poll_models.dart';
 import '../style/poll_style.dart';
+import 'poll_expressive.dart';
 import 'poll_option_button.dart';
 import 'poll_option_result.dart';
 import 'poll_status_bar.dart';
@@ -57,6 +58,9 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
   /// flips to the results view even if [widget.vote] never changes.
   Timer? _endTimer;
   bool _isSubmitting = false;
+
+  /// The single-select option whose vote is submitting, for its loader.
+  T? _submittingOptionId;
 
   /// Locally toggled-but-not-yet-submitted options for a multi-select poll.
   late Set<T> _pendingSelection;
@@ -122,12 +126,18 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
     } catch (error, stackTrace) {
       widget.onVoteError?.call(error, stackTrace);
     } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _submittingOptionId = null;
+        });
+      }
     }
   }
 
   void _selectSingle(T id) {
     if (!widget.poll.isActive || _isSubmitting) return;
+    _submittingOptionId = id;
     _submit(PollVote<T>({id}));
   }
 
@@ -154,18 +164,42 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
   Widget build(BuildContext context) {
     final poll = widget.poll;
     final vote = widget.vote;
+    final style = widget.style;
+    final expressive = style.variant == StyleVariant.material3Expressive;
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final hasVoted = vote != null && vote.selectedOptionIds.isNotEmpty;
     final showResults = hasVoted || poll.hasEnded;
 
+    final Widget options = Column(
+      key: ValueKey<bool>(showResults),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: _buildOptions(showResults: showResults),
+    );
+
     return Container(
-      margin: widget.style.margin,
-      padding: widget.style.padding,
+      margin: style.margin,
+      padding:
+          style.padding ??
+          (expressive
+              ? const EdgeInsets.fromLTRB(16, 16, 16, 12)
+              : const EdgeInsets.fromLTRB(15, 15, 15, 5)),
       decoration:
-          widget.style.decoration ??
-          BoxDecoration(
-            border: Border.all(color: Theme.of(context).dividerColor),
-            color: Theme.of(context).colorScheme.surface,
-          ),
+          style.decoration ??
+          (expressive
+              ? ShapeDecoration(
+                  color: colors.surfaceContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        style.containerRadius ??
+                        const BorderRadius.all(Radius.circular(28)),
+                  ),
+                )
+              : BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  color: colors.surface,
+                )),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -173,70 +207,22 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
           widget.titleBuilder?.call(context) ??
               Text(
                 poll.title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style: expressive
+                    ? textTheme.titleMedium?.copyWith(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w600,
+                      )
+                    : textTheme.titleSmall?.copyWith(color: colors.onSurface),
               ),
-          const SizedBox(height: 10),
-
-          /// This list will generate all the necessary poll options.
-          ...List.generate(poll.options.length, (index) {
-            final option = poll.options[index];
-            final Widget optionWidget;
-            if (showResults) {
-              /// Check for 0/0 is present to avoid a division by zero.
-              final percentage = poll.totalVotes == 0
-                  ? 0.0
-                  : option.voteCount / poll.totalVotes;
-              optionWidget = PollOptionResult(
-                label: option.label,
-                percentage: percentage,
-                isSelected:
-                    vote?.selectedOptionIds.contains(option.id) ?? false,
-                textStyle: widget.style.optionTextStyle,
-                progressBarColor: widget.style.progressBarColor,
-              );
-            } else if (poll.allowsMultipleAnswers) {
-              /// In multi-select mode, tapping only toggles the option; the vote is submitted separately.
-              optionWidget = PollOptionButton(
-                label: option.label,
-                textStyle: widget.style.optionTextStyle,
-                shape: widget.style.optionShape,
-                showSelectionIndicator: true,
-                isSelected: _pendingSelection.contains(option.id),
-                onPressed: () => _toggleMultiple(option.id),
-              );
-            } else {
-              optionWidget = PollOptionButton(
-                label: option.label,
-                textStyle: widget.style.optionTextStyle,
-                shape: widget.style.optionShape,
-                onPressed: () => _selectSingle(option.id),
-              );
-            }
-
-            /// Adds a gap above every option except the first so buttons/results aren't flush against each other.
-            return index == 0
-                ? optionWidget
-                : Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: optionWidget,
-                  );
-          }),
-          const SizedBox(height: 5),
+          SizedBox(height: expressive ? 16 : 10),
+          if (expressive) _animateSwitch(context, options) else options,
+          SizedBox(height: expressive ? 12 : 5),
 
           /// For multi-select polls, show a submit button to cast the vote for all toggled options.
           if (poll.allowsMultipleAnswers && !showResults)
             Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: ElevatedButton(
-                onPressed: _pendingSelection.isNotEmpty && !_isSubmitting
-                    ? _submitMultiple
-                    : null,
-                child: Text(widget.locale.voteButtonLabel),
-              ),
+              padding: EdgeInsets.only(bottom: expressive ? 8 : 5),
+              child: _buildVoteButton(context, expressive: expressive),
             ),
 
           PollStatusBar(
@@ -246,8 +232,109 @@ class _SimplePollState<T extends Object> extends State<SimplePoll<T>> {
             hasEnded: poll.hasEnded,
             showUndo: poll.isEditable && hasVoted && poll.isActive,
             onUndo: _undo,
+            variant: style.variant,
           ),
         ],
+      ),
+    );
+  }
+
+  List<Widget> _buildOptions({required bool showResults}) {
+    final poll = widget.poll;
+    final style = widget.style;
+    final maxVotes = poll.options.fold(
+      0,
+      (max, option) => option.voteCount > max ? option.voteCount : max,
+    );
+
+    /// This list will generate all the necessary poll options.
+    return List.generate(poll.options.length, (index) {
+      final option = poll.options[index];
+      final Widget optionWidget;
+      if (showResults) {
+        /// Check for 0/0 is present to avoid a division by zero.
+        final percentage = poll.totalVotes == 0
+            ? 0.0
+            : option.voteCount / poll.totalVotes;
+        optionWidget = PollOptionResult(
+          label: option.label,
+          percentage: percentage,
+          isSelected:
+              widget.vote?.selectedOptionIds.contains(option.id) ?? false,
+          isLeading: maxVotes > 0 && option.voteCount == maxVotes,
+          textStyle: style.optionTextStyle,
+          progressBarColor: style.progressBarColor,
+          progressBarHeight: style.progressBarHeight,
+          variant: style.variant,
+          locale: widget.locale,
+        );
+      } else if (poll.allowsMultipleAnswers) {
+        /// In multi-select mode, tapping only toggles the option; the vote is submitted separately.
+        optionWidget = PollOptionButton(
+          label: option.label,
+          textStyle: style.optionTextStyle,
+          shape: style.optionShape,
+          variant: style.variant,
+          showSelectionIndicator: true,
+          isSelected: _pendingSelection.contains(option.id),
+          onPressed: () => _toggleMultiple(option.id),
+        );
+      } else {
+        optionWidget = PollOptionButton(
+          label: option.label,
+          textStyle: style.optionTextStyle,
+          shape: style.optionShape,
+          variant: style.variant,
+          isLoading: _isSubmitting && _submittingOptionId == option.id,
+          onPressed: () => _selectSingle(option.id),
+        );
+      }
+
+      /// Adds a gap above every option except the first so buttons/results aren't flush against each other.
+      return index == 0
+          ? optionWidget
+          : Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: optionWidget,
+            );
+    });
+  }
+
+  Widget _buildVoteButton(BuildContext context, {required bool expressive}) {
+    final onPressed = _pendingSelection.isNotEmpty && !_isSubmitting
+        ? _submitMultiple
+        : null;
+    final label = Text(widget.locale.voteButtonLabel);
+    if (!expressive) return ElevatedButton(onPressed: onPressed, child: label);
+    return pollButtonTheme(
+      context,
+      variant: StyleVariant.material3Expressive,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(sizeVariant: ButtonSizeVariant.medium),
+        icon: _isSubmitting ? const PollShapeLoader() : null,
+        label: label,
+      ),
+    );
+  }
+
+  /// Cross-fades and resizes between the voting and results views.
+  Widget _animateSwitch(BuildContext context, Widget child) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    const duration = Durations.medium4;
+    return AnimatedSize(
+      duration: duration,
+      curve: Easing.emphasizedDecelerate,
+      alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: duration,
+        switchInCurve: Easing.emphasizedDecelerate,
+        switchOutCurve: Easing.emphasizedAccelerate,
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.topCenter,
+          children: [...previous, ?current],
+        ),
+        child: child,
       ),
     );
   }

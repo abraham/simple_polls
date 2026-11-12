@@ -1,6 +1,17 @@
 ## Unreleased
 
 * Switched to `material_ui`.
+* BREAKING: polls now use Material 3 Expressive by default: a rounded card,
+Expressive buttons whose shape morphs when pressed or selected, spring
+animated result bars, and Material shapes for the selection indicator, the
+user's pick, the leading option(s), the submitting loader, and ended polls.
+Pass `PollStyle(variant: StyleVariant.material3)` to keep the 2.x look.
+* Added `PollStyle.variant`, `progressBarHeight`, and `containerRadius`.
+`PollStyle.padding` and `optionShape` are now nullable and default per
+variant.
+* Added `PollLocale.selectedLabel` and `leadingLabel` for screen readers.
+* Undo is now a real button (touch target and semantics) in both variants.
+* Text uses the theme's text styles instead of fixed font sizes.
 
 ## 2.0.0
 

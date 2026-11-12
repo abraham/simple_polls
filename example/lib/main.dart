@@ -15,10 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primaryColor: Colors.indigo,
-        primarySwatch: Colors.indigo,
-      ),
+      theme: ThemeData(colorSchemeSeed: Colors.indigo),
       debugShowCheckedModeBanner: false,
       home: const ExampleApp(),
     );
@@ -56,15 +53,7 @@ class _ExampleAppState extends State<ExampleApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Polls Widget',
-          style: TextStyle(fontSize: 14, color: Colors.white),
-        ),
-        centerTitle: true,
-        toolbarHeight: 40,
-      ),
+      appBar: AppBar(title: const Text('Polls Widget'), centerTitle: true),
       body: SimplePoll<int>(
         poll: _poll,
         vote: _vote,
@@ -84,16 +73,11 @@ class _ExampleAppState extends State<ExampleApp> {
         },
         onVoteError: (error, stackTrace) => log('Vote failed: $error'),
 
-        /// A single object controls margin/padding/decoration/text style/shape.
-        style: PollStyle(
-          margin: const EdgeInsets.all(15),
-          padding: const EdgeInsets.all(15),
-          optionTextStyle: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
+        /// A single object controls the style variant, margin, padding,
+        /// decoration, text style, and shapes. Polls use Material 3
+        /// Expressive by default; pass `variant: StyleVariant.material3`
+        /// for the 2.x look.
+        style: const PollStyle(margin: EdgeInsets.all(16)),
 
         /// Built-in locales: [PollLocale.en] (default), [PollLocale.it],
         /// [PollLocale.fr], [PollLocale.es], [PollLocale.de]. Construct a

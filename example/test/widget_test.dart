@@ -17,11 +17,12 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     expect(find.text('opzione 1'), findsOneWidget);
-    expect(find.byType(OutlinedButton), findsNWidgets(3));
+    expect(find.byType(ElevatedButton), findsNWidgets(3));
 
     await tester.tap(find.text('opzione 1'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(OutlinedButton), findsNothing);
+    expect(find.byType(ElevatedButton), findsNothing);
+    expect(find.text('40.6%'), findsOneWidget);
   });
 }

@@ -13,6 +13,12 @@ class PollLocale {
   final String pollingEndedLabel;
   final String undoLabel;
   final String voteButtonLabel;
+
+  /// Screen reader label for the user's own pick in the results.
+  final String selectedLabel;
+
+  /// Screen reader label for the option(s) with the most votes.
+  final String leadingLabel;
   final PollTimeRemainingFormatter formatTimeRemaining;
 
   const PollLocale({
@@ -21,6 +27,8 @@ class PollLocale {
     required this.pollingEndedLabel,
     required this.undoLabel,
     required this.voteButtonLabel,
+    this.selectedLabel = 'Selected',
+    this.leadingLabel = 'Leading',
     required this.formatTimeRemaining,
   });
 
@@ -39,6 +47,8 @@ class PollLocale {
     pollingEndedLabel: 'Sondaggio terminato',
     undoLabel: 'disfare',
     voteButtonLabel: 'Vota',
+    selectedLabel: 'Selezionato',
+    leadingLabel: 'In testa',
     formatTimeRemaining: _formatTimeRemainingIt,
   );
 
@@ -48,6 +58,8 @@ class PollLocale {
     pollingEndedLabel: 'Sondage terminé',
     undoLabel: 'annuler',
     voteButtonLabel: 'Voter',
+    selectedLabel: 'Sélectionné',
+    leadingLabel: 'En tête',
     formatTimeRemaining: _formatTimeRemainingFr,
   );
 
@@ -57,6 +69,8 @@ class PollLocale {
     pollingEndedLabel: 'Encuesta finalizada',
     undoLabel: 'deshacer',
     voteButtonLabel: 'Votar',
+    selectedLabel: 'Seleccionado',
+    leadingLabel: 'A la cabeza',
     formatTimeRemaining: _formatTimeRemainingEs,
   );
 
@@ -66,6 +80,8 @@ class PollLocale {
     pollingEndedLabel: 'Umfrage beendet',
     undoLabel: 'rückgängig machen',
     voteButtonLabel: 'Abstimmen',
+    selectedLabel: 'Ausgewählt',
+    leadingLabel: 'Führend',
     formatTimeRemaining: _formatTimeRemainingDe,
   );
 }

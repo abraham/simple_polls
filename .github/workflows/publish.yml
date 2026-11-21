@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
       # Sets up the pub.dev OIDC token.
       - uses: dart-lang/setup-dart@v1.8.2
-      - uses: flutter-actions/setup-flutter@v4
+      - uses: flutter-actions/setup-flutter@v5
         with:
           version: ${{ env.FLUTTER_VERSION }}
       - id: version

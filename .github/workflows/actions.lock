@@ -5,11 +5,11 @@ version: 'v0.0.3'
 workflows:
     '.github/workflows/ci.yml':
         - 'actions/checkout@v7.0.1'
-        - 'flutter-actions/setup-flutter@v4'
+        - 'flutter-actions/setup-flutter@v5'
     '.github/workflows/publish.yml':
         - 'actions/checkout@v7.0.1'
         - 'dart-lang/setup-dart@v1.8.2'
-        - 'flutter-actions/setup-flutter@v4'
+        - 'flutter-actions/setup-flutter@v5'
 dependencies:
     'actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9':
         ref: 'v6.1.0'
@@ -26,9 +26,9 @@ dependencies:
         commit: 'sha1-2286a0c042b44434fe26d292bbce8d34f7ec662b'
         owner_id: 1609975
         repo_id: 320563763
-    'flutter-actions/setup-flutter@v4':
-        ref: 'v4'
-        commit: 'sha1-adb607ae976a9e00473569facfc69813c637a060'
+    'flutter-actions/setup-flutter@v5':
+        ref: 'v5'
+        commit: 'sha1-0e3ac53a5126c46be01612423cf26b5d59018adc'
         owner_id: 81565657
         repo_id: 348352665
         uses:
